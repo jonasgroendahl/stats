@@ -1,4 +1,17 @@
 .stats-container {
   display: flex;
   padding: 30px;
+  flex-direction: column;
+}
+
+.flex {
+  display: flex;
+}
+
+.column {
+  flex-flow: wrap column !important;
+}
+
+.row {
+  flex-flow: wrap row !important;
 }
