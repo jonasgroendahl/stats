@@ -4,7 +4,9 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^1.5.0",
+    "@material-ui/icons": "^2.0.2",
     "axios": "^0.18.0",
+    "date-fns": "^1.29.0",
     "fullcalendar": "^4.0.0-alpha",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",

@@ -3,3 +3,11 @@ body {
   padding: 0;
   font-family: sans-serif;
 }
+
+.full-width{
+  width:100%;
+}
+
+.ml-auto{
+  margin-left:auto;
+}
