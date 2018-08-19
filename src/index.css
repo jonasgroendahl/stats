@@ -11,3 +11,17 @@ body {
 .ml-auto{
   margin-left:auto;
 }
+
+.calendar-wrapper{
+  margin-top: 10px;
+  height: calc(100vh - 300px);
+}
+
+#calendar .fc-event{
+  background-color: rgb(47, 47, 47);
+  border-color: rgb(47, 47, 47);
+}
+
+#calendar .fc-event .fc-bg{
+  opacity: 0;
+}

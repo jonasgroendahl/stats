@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "./StatsPage.css";
 import StatsTable from "./components/StatsTable";
+import Calendar from "./components/Calendar";
 import {
   RadioGroup,
   FormControlLabel,
@@ -29,7 +30,7 @@ class App extends Component {
         type: 'Scheduled'
       }
     ],
-    report: 'Class title report',
+    report: 'class_report',
     interval: "1 week",
     type: "All",
     show: 'All',
@@ -55,8 +56,9 @@ class App extends Component {
             <FormLabel component="legend">Select Report</FormLabel>
           </Grid>
           <Grid item xs={6}>
-            <Select fullWidth value={report} onChange={this.handleChange}>
-              <MenuItem value="Class title report">Class title report</MenuItem>
+            <Select fullWidth value={report} onChange={this.handleChange} name="report">
+              <MenuItem value="class_report">Class title report</MenuItem>
+              <MenuItem value="calendar_report">Wexer Count calendar report</MenuItem>
             </Select>
           </Grid>
         </Grid>
@@ -153,11 +155,13 @@ class App extends Component {
           </Grid>
         </Grid>
         <Button variant="raised">Generate report</Button>
-        <StatsTable data={data} />
+        {report == 'class_report' &&
+          <StatsTable data={data} />}
+        {report == 'calendar_report' && <Calendar />}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card>
             <CardContent>
-              <TextField type="date" name="start_date" onChange={this.handleChange} />
+              <TextField type="date" name="start_date" onChange={this.handleChange} style={{ marginRight: 10 }} />
               <TextField type="date" name="end_date" onChange={this.handleChange} />
               <Button onClick={() => this.setState({ customDateEl: null, interval: '1 week', start_date: '', end_date: '' })}>Cancel</Button>
               <Button disabled={!start_date || !end_date} variant="outlined" onClick={() => this.setState({ customDateEl: null })}>Apply</Button>
