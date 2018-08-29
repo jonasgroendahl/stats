@@ -64,10 +64,14 @@ class App extends Component {
       `/v2/stats?summed=1&gym_id=${this.state.gymId}`,
       body
     );
+    const startdate = format(subDays(new Date(), 7), "YYYY-MM-DD");
+    const enddate = format(new Date(), "YYYY-MM-DD");
     this.setState({
       data: result.data,
       token: resultToken.data.access_token,
-      loading: false
+      loading: false,
+      start_date: startdate,
+      end_date: enddate
     });
   }
 
@@ -85,12 +89,13 @@ class App extends Component {
           ? this.state.start_date
           : this.state.custom_start_date,
       end:
-        this.state.end_date !== "custom"
+        this.state.interval !== "custom"
           ? this.state.end_date
           : this.state.custom_end_date,
       zoneid: 5970,
       token: this.state.token
     };
+    console.log("Sending body", body);
     if (this.state.report === "schedule_report") {
       if (this.state.token) {
         dataResponse = await api.post(
@@ -115,6 +120,13 @@ class App extends Component {
     }
     console.log("Data retrieval", dataResponse.data);
     this.setState({ data: dataResponse.data, loading: false });
+  };
+
+  setInterval = (start, end) => {
+    this.setState(
+      { custom_start_date: start, custom_end_date: end, interval: "custom" },
+      () => this.getData()
+    );
   };
 
   handleChange = event => {
@@ -286,13 +298,15 @@ class App extends Component {
             </Grid>
           </Grid>
         )}
-        <Button variant="raised" color="primary" onClick={this.getData}>
-          Generate report
-        </Button>
+        {report !== "calendar_report" && (
+          <Button variant="raised" color="primary" onClick={this.getData}>
+            Generate report
+          </Button>
+        )}
         {report !== "calendar_report" ? (
           <StatsTable data={data} report={report} />
         ) : (
-          <Calendar data={data} />
+          <Calendar data={data} setInterval={this.setInterval} />
         )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card>

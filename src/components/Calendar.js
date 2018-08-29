@@ -29,6 +29,18 @@ export default class CalendarComponent extends PureComponent {
         span.style.margin = "2px";
         span.innerHTML = event.count;
         element.querySelector(".fc-time").appendChild(span);
+      },
+      viewRender: view => {
+        console.log(
+          "Changed the view!",
+          view,
+          view.start.format("YYYY-MM-DD"),
+          view.end.format("YYYY-MM-DD")
+        );
+        this.props.setInterval(
+          view.start.format("YYYY-MM-DD"),
+          view.end.format("YYYY-MM-DD")
+        );
       }
     };
     this.calendar = new Calendar(div, options);
