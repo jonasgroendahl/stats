@@ -46,7 +46,7 @@ export default class StatsTable extends PureComponent {
                   <TableCell>
                     {format(dataEntry.datostempel, "HH:mm")}
                   </TableCell>
-                  <TableCell numeric>{dataEntry.views}</TableCell>
+                  <TableCell numeric>{dataEntry.count}</TableCell>
                   <TableCell>
                     {dataEntry.ondemandselections ? "On-Demand" : "Scheduled"}
                   </TableCell>

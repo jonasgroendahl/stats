@@ -1,33 +1,64 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent } from "react";
 import { Calendar } from "fullcalendar";
-import '../../node_modules/fullcalendar/dist/fullcalendar.min.css';
+import "../../node_modules/fullcalendar/dist/fullcalendar.min.css";
+import { format, addSeconds } from "date-fns";
 
 export default class CalendarComponent extends PureComponent {
+  componentDidMount() {
+    this.createCalendar();
+  }
 
-    componentDidMount() {
-        const div = document.querySelector("#calendar");
-        const options = {
-            defaultView: 'agendaWeek',
-            allDaySlot: false,
-            height: "parent",
-            events: [{ start: '2018-08-19 14:00:00', end: '2018-08-19 15:00:00', title: 'Body Pump', views: 4 }],
-            eventRender: (event, element) => {
-                const span = document.createElement('span');
-                span.style.float = 'right';
-                span.style.margin = '2px';
-                span.innerHTML = event.views;
-                element.querySelector('.fc-time').appendChild(span);
-            }
-        }
-        this.calendar = new Calendar(div, options);
-        this.calendar.render();
+  componentDidUpdate(prevProps) {
+    if (prevProps.data.length !== this.props.data.length) {
+      console.log("New events!");
+      this.calendar.refetchEvents();
     }
+  }
 
-    render() {
-        return (
-            <div className="calendar-wrapper">
-                <div id="calendar" />
-            </div>
-        )
-    }
+  createCalendar = () => {
+    const div = document.querySelector("#calendar");
+    const options = {
+      defaultView: "agendaWeek",
+      allDaySlot: false,
+      height: "parent",
+      events: this.fetchData,
+      slotDuration: "00:05:00",
+      eventRender: (event, element) => {
+        const span = document.createElement("span");
+        span.style.float = "right";
+        span.style.margin = "2px";
+        span.innerHTML = event.count;
+        element.querySelector(".fc-time").appendChild(span);
+      }
+    };
+    this.calendar = new Calendar(div, options);
+    this.calendar.render();
+  };
+
+  fetchData = (start, end, _, callback) => {
+    const mappedData = this.props.data.map(data => {
+      const start = format(new Date(data.datostempel), "YYYY-MM-DD HH:mm:ss");
+      const end = format(
+        addSeconds(new Date(data.datostempel), data.video_duration_sec),
+        "YYYY-MM-DD HH:mm:ss"
+      );
+      return {
+        start,
+        end,
+        title: data.video_title_long,
+        video_id: data.indslagid,
+        count: data.count
+      };
+    });
+    console.log(mappedData);
+    callback(mappedData);
+  };
+
+  render() {
+    return (
+      <div className="calendar-wrapper">
+        <div id="calendar" />
+      </div>
+    );
+  }
 }
