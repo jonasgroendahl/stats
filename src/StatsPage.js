@@ -38,7 +38,7 @@ class App extends Component {
     ],
     report: "class_report",
     interval: "1 week",
-    type: "All",
+    type: "all",
     show: "All",
     customDateEl: null,
     start_date: "",
@@ -48,7 +48,7 @@ class App extends Component {
     playerId: 1994,
     loading: true,
     custom_start_date: "",
-    custom_end_date: ""
+    custom_end_date: "",
   };
 
   async componentDidMount() {
@@ -80,6 +80,7 @@ class App extends Component {
     this.setState({ report: event.target.value }, () => this.getData());
   };
 
+
   getData = async () => {
     this.setState({ loading: true });
     let dataResponse;
@@ -93,7 +94,8 @@ class App extends Component {
           ? this.state.end_date
           : this.state.custom_end_date,
       zoneid: 5970,
-      token: this.state.token
+      token: this.state.token,
+      type: this.state.type
     };
     console.log("Sending body", body);
     if (this.state.report === "schedule_report") {
@@ -111,9 +113,10 @@ class App extends Component {
         body
       );
     } else if (this.state.report == "calendar_report") {
+      body.type == 'ondemand';
       dataResponse = await api.post(
-        `/v2/stats?ondemand=0&identitetid=${this.state.playerId}&gym_id=${
-          this.state.gymId
+        `/v2/stats?&identitetid=${this.state.playerId}&gym_id=${
+        this.state.gymId
         }`,
         body
       );
@@ -240,7 +243,7 @@ class App extends Component {
                   control={<Radio onClick={this.toggleDatepicker} />}
                   label={
                     customDateEl ||
-                    (custom_start_date !== "" && custom_end_date !== "")
+                      (custom_start_date !== "" && custom_end_date !== "")
                       ? `${custom_start_date} - ${custom_end_date}`
                       : "Custom"
                   }
@@ -250,32 +253,34 @@ class App extends Component {
             </Grid>
           </Grid>
         )}
-        <Grid container>
-          <Grid item xs={6}>
-            <FormLabel component="legend">Type</FormLabel>
+        {report !== 'calendar_report' &&
+          <Grid container>
+            <Grid item xs={6}>
+              <FormLabel component="legend">Type</FormLabel>
+            </Grid>
+            <Grid item xs={6}>
+              <RadioGroup
+                className="row"
+                onChange={this.handleChange}
+                name="type"
+                value={type}
+              >
+                <FormControlLabel value="all" control={<Radio />} label="All" />
+                <FormControlLabel
+                  value="scheduled"
+                  control={<Radio />}
+                  label="Scheduled"
+                />
+                <FormControlLabel value="live" control={<Radio />} label="Live" />
+                <FormControlLabel
+                  value="ondemand"
+                  control={<Radio />}
+                  label="On Demand"
+                />
+              </RadioGroup>
+            </Grid>
           </Grid>
-          <Grid item xs={6}>
-            <RadioGroup
-              className="row"
-              onChange={this.handleChange}
-              name="type"
-              value={type}
-            >
-              <FormControlLabel value="All" control={<Radio />} label="All" />
-              <FormControlLabel
-                value="Scheduled"
-                control={<Radio />}
-                label="Scheduled"
-              />
-              <FormControlLabel value="Live" control={<Radio />} label="Live" />
-              <FormControlLabel
-                value="On Demand"
-                control={<Radio />}
-                label="On Demand"
-              />
-            </RadioGroup>
-          </Grid>
-        </Grid>
+        }
         {report !== "calendar_report" && (
           <Grid container>
             <Grid item xs={6}>
@@ -306,8 +311,8 @@ class App extends Component {
         {report !== "calendar_report" ? (
           <StatsTable data={data} report={report} />
         ) : (
-          <Calendar data={data} setInterval={this.setInterval} />
-        )}
+            <Calendar data={data} setInterval={this.setInterval} />
+          )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card>
             <CardContent>

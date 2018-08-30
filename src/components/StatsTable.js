@@ -11,6 +11,24 @@ import { ImportExport } from "@material-ui/icons";
 import { format } from "date-fns";
 
 export default class StatsTable extends PureComponent {
+
+  mapCategory = (category) => {
+    switch (category) {
+      case 'D':
+        return 'Mind Body';
+      case 'S':
+        return 'Conditioning';
+      case 'W':
+        return 'Cardio';
+      case 'C':
+        return 'Cycling';
+      case 'K':
+        return 'Kids';
+      default:
+        return 'Senior';
+    }
+  }
+
   render() {
     let report = null;
     if (this.props.report === "schedule_report") {
@@ -48,7 +66,7 @@ export default class StatsTable extends PureComponent {
                   </TableCell>
                   <TableCell numeric>{dataEntry.count}</TableCell>
                   <TableCell>
-                    {dataEntry.ondemandselections ? "On-Demand" : "Scheduled"}
+                    {dataEntry.video_typeid == 100 ? "Live" : dataEntry.ondemand_selections ? "On-Demand" : "Scheduled"}
                   </TableCell>
                 </TableRow>
               ))}
@@ -85,12 +103,12 @@ export default class StatsTable extends PureComponent {
               {this.props.data.map(dataEntry => (
                 <TableRow>
                   <TableCell>{dataEntry.video_title_long}</TableCell>
-                  <TableCell>{dataEntry.video_category}</TableCell>
+                  <TableCell>{this.mapCategory(dataEntry.video_category)}</TableCell>
                   <TableCell>{dataEntry.video_level}</TableCell>
                   <TableCell>{dataEntry.providername}</TableCell>
                   <TableCell numeric>{dataEntry.views}</TableCell>
                   <TableCell numeric>{dataEntry.count}</TableCell>
-                  <TableCell numeric>{dataEntry.avg}</TableCell>
+                  <TableCell numeric>{(dataEntry.count / dataEntry.views).toFixed(2)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
