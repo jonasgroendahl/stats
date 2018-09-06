@@ -9,6 +9,7 @@ import {
 } from "@material-ui/core";
 import { ImportExport } from "@material-ui/icons";
 import { format } from "date-fns";
+import XlsExport from "xlsexport";
 
 export default class StatsTable extends PureComponent {
 
@@ -29,6 +30,33 @@ export default class StatsTable extends PureComponent {
     }
   }
 
+  exportData = () => {
+    console.log('exporting data');
+    let mappedData = null;
+    if (this.props.report === 'schedule_report') {
+      mappedData = this.props.data.map(dataEntry => ({
+        title: dataEntry.video_title_long,
+        date: format(new Date(dataEntry.datostempel), "dddd Do MMMM"),
+        start: format(new Date(dataEntry.datostempel), "HH:mm"),
+        count: dataEntry.count,
+        type: dataEntry.video_typeid === 100 ? "Live" : dataEntry.ondemand_selections ? "On-Demand" : "Scheduled"
+      }))
+    }
+    else {
+      mappedData = this.props.data.map(dataEntry => ({
+        title: dataEntry.video_title_long,
+        category: this.mapCategory(dataEntry.video_category),
+        level: dataEntry.video_level,
+        provider: dataEntry.providername,
+        views: dataEntry.views,
+        count: dataEntry.count,
+        avg: (dataEntry.count / dataEntry.views).toFixed(2)
+      }))
+    }
+    const xls = new XlsExport(mappedData, 'Stats report');
+    xls.exportToXLS('stats_export.xls');
+  }
+
   render() {
     let report = null;
     if (this.props.report === "schedule_report") {
@@ -40,7 +68,7 @@ export default class StatsTable extends PureComponent {
               This report shows each individual event with Wexer Count data if
               it is available.
             </p>
-            <Button style={{ marginLeft: "auto" }}>
+            <Button style={{ marginLeft: "auto" }} onClick={this.exportData}>
               EXPORT <ImportExport style={{ marginLeft: 15 }} />
             </Button>
           </div>
@@ -83,7 +111,7 @@ export default class StatsTable extends PureComponent {
               This report shows the total number of views for each title within
               the selected timeframe.
             </p>
-            <Button style={{ marginLeft: "auto" }}>
+            <Button style={{ marginLeft: "auto" }} onClick={this.exportData}>
               EXPORT <ImportExport style={{ marginLeft: 15 }} />
             </Button>
           </div>
