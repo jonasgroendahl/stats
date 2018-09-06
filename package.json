@@ -11,7 +11,8 @@
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-scripts": "1.1.4",
-    "source-map-explorer": "^1.6.0"
+    "source-map-explorer": "^1.6.0",
+    "xlsexport": "github:jonasgroendahl/xlsExport"
   },
   "scripts": {
     "start": "react-scripts start",
