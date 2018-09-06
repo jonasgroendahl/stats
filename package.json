@@ -12,7 +12,7 @@
     "react-dom": "^16.4.2",
     "react-scripts": "1.1.4",
     "source-map-explorer": "^1.6.0",
-    "xlsexport": "github:jonasgroendahl/xlsExport/tree/26fe4b3ef9faa6cf095a0ea919f1955208938507"
+    "xlsexport": "github:jonasgroendahl/xlsExport"
   },
   "scripts": {
     "start": "react-scripts start",
