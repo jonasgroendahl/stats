@@ -66,7 +66,7 @@ export default class StatsTable extends PureComponent {
                   </TableCell>
                   <TableCell numeric>{dataEntry.count}</TableCell>
                   <TableCell>
-                    {dataEntry.video_typeid == 100 ? "Live" : dataEntry.ondemand_selections ? "On-Demand" : "Scheduled"}
+                    {dataEntry.video_typeid === 100 ? "Live" : dataEntry.ondemand_selections ? "On-Demand" : "Scheduled"}
                   </TableCell>
                 </TableRow>
               ))}

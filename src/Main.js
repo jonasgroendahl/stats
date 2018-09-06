@@ -43,21 +43,42 @@ class App extends Component {
     customDateEl: null,
     start_date: "",
     end_date: "",
-    gymId: 3236,
+    gymId: 1060,
+    gymName: '',
+    sensors: [],
     token: 0,
     playerId: 1994,
+    zoneId: 5970,
     loading: true,
     custom_start_date: "",
     custom_end_date: "",
+    players: []
   };
 
   async componentDidMount() {
+    const resultSensors = await api.get(`/v2/gyms/${this.state.gymId}/sensors`);
+    api.get(`/v2/gyms/${this.state.gymId}/players`).then(result => {
+      if (result.data.length > 0) {
+        this.setState({ players: result.data });
+      }
+    });
+    let gymName = '';
+    let sensors = [];
+    let zoneId = 5970;
+    let playerId = 1994;
+    if (resultSensors.data.length > 0) {
+      console.log("Sensors found for client");
+      gymName = resultSensors.data[0].firmanavn;
+      sensors = resultSensors.data;
+      zoneId = resultSensors.data[0].zone_id;
+      playerId = resultSensors.data[0].player_id;
+    }
     const resultToken = await api.post(`/v1/sensors/vc`);
     const body = {
-      kundeid: 3236,
+      kundeid: this.state.gymId,
       start: "2018-08-22",
       end: "2018-08-29",
-      zoneid: 5970,
+      zoneid: zoneId,
       token: resultToken.data.access_token
     };
     const result = await api.post(
@@ -71,7 +92,11 @@ class App extends Component {
       token: resultToken.data.access_token,
       loading: false,
       start_date: startdate,
-      end_date: enddate
+      end_date: enddate,
+      sensors,
+      gymName,
+      playerId,
+      zoneId
     });
   }
 
@@ -93,7 +118,7 @@ class App extends Component {
         this.state.interval !== "custom"
           ? this.state.end_date
           : this.state.custom_end_date,
-      zoneid: 5970,
+      zoneid: this.state.zoneId,
       token: this.state.token,
       type: this.state.type
     };
@@ -107,13 +132,13 @@ class App extends Component {
       } else {
         dataResponse = await api.get(`/v2/stats`);
       }
-    } else if (this.state.report == "class_report") {
+    } else if (this.state.report === "class_report") {
       dataResponse = await api.post(
         `/v2/stats?summed=1&gym_id=${this.state.gymId}`,
         body
       );
-    } else if (this.state.report == "calendar_report") {
-      body.type == 'ondemand';
+    } else if (this.state.report === "calendar_report") {
+      body.type = 'scheduled';
       dataResponse = await api.post(
         `/v2/stats?&identitetid=${this.state.playerId}&gym_id=${
         this.state.gymId
@@ -134,6 +159,10 @@ class App extends Component {
 
   handleChange = event => {
     this.setState({ [event.target.name]: event.target.value });
+  };
+
+  handlePlayerChange = event => {
+    this.setState({ playerId: event.target.value }, () => this.getData());
   };
 
   handleDateChange = event => {
@@ -181,6 +210,9 @@ class App extends Component {
     } = this.state;
     return (
       <div className="App stats-container">
+        <p>Gym name: {' '} {this.state.gymName}</p>
+        <p>Count sensors available:</p>
+        {this.state.sensors.map(sensor => <p>Sensor: {' '}{sensor.name}</p>)}
         <Grid container style={{ marginBottom: 12 }}>
           <Grid item xs={6}>
             <FormLabel component="legend">Select Report</FormLabel>
@@ -206,8 +238,8 @@ class App extends Component {
               <FormLabel component="legend">Select Player</FormLabel>
             </Grid>
             <Grid item xs={6}>
-              <Select onChange={this.handleChange} value={playerId} fullWidth>
-                <MenuItem value={1994}>Test player</MenuItem>
+              <Select onChange={this.handlePlayerChange} value={playerId} fullWidth>
+                {this.state.players.map(player => <MenuItem value={player.identitetid}>{player.navn}</MenuItem>)}
               </Select>
             </Grid>
           </Grid>
