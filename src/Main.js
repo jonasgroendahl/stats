@@ -73,13 +73,13 @@ class App extends Component {
       zoneId = resultSensors.data[0].zone_id;
       playerId = resultSensors.data[0].player_id;
     }
-    const resultToken = await api.post(`/v1/sensors/vc`);
+    const token = await this.getToken();
     const body = {
       kundeid: this.state.gymId,
       start: "2018-08-22",
       end: "2018-08-29",
       zoneid: zoneId,
-      token: resultToken.data.access_token
+      token: token
     };
     const result = await api.post(
       `/v2/stats?summed=1&gym_id=${this.state.gymId}`,
@@ -89,7 +89,6 @@ class App extends Component {
     const enddate = format(new Date(), "YYYY-MM-DD");
     this.setState({
       data: result.data,
-      token: resultToken.data.access_token,
       loading: false,
       start_date: startdate,
       end_date: enddate,
@@ -97,6 +96,18 @@ class App extends Component {
       gymName,
       playerId,
       zoneId
+    });
+    setInterval(() => {
+      this.getToken();
+      console.log("Getting a new token");
+    }, 1740000);
+  }
+
+  getToken = () => {
+    return new Promise(async resolve => {
+      const result = await api.post(`/v1/sensors/vc`);
+      this.setState({ token: result.data.access_token });
+      resolve(result.data.access_token);
     });
   }
 

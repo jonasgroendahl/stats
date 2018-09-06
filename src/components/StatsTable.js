@@ -59,10 +59,10 @@ export default class StatsTable extends PureComponent {
                 <TableRow>
                   <TableCell>{dataEntry.video_title_long}</TableCell>
                   <TableCell>
-                    {format(dataEntry.datostempel, "dddd Do MMMM")}
+                    {format(new Date(dataEntry.datostempel), "dddd Do MMMM")}
                   </TableCell>
                   <TableCell>
-                    {format(dataEntry.datostempel, "HH:mm")}
+                    {format(new Date(dataEntry.datostempel), "HH:mm")}
                   </TableCell>
                   <TableCell numeric>{dataEntry.count}</TableCell>
                   <TableCell>
