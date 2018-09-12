@@ -57,30 +57,35 @@ export default class StatsTable extends PureComponent {
     xls.exportToXLS('stats_export.xls');
   }
 
+
+
+
   render() {
     let report = null;
+    const exportVar =
+      <Button style={{ marginLeft: "auto" }} onClick={this.exportData}>
+        EXPORT <ImportExport style={{ marginLeft: 15 }} />
+      </Button>;
     if (this.props.report === "schedule_report") {
       report = (
         <Fragment>
           <h1>Schedule report</h1>
-          <div className="flex">
+          <div className="flex export-wrapper">
             <p>
               This report shows each individual event with Wexer Count data if
               it is available.
             </p>
-            <Button style={{ marginLeft: "auto" }} onClick={this.exportData}>
-              EXPORT <ImportExport style={{ marginLeft: 15 }} />
-            </Button>
+            {exportVar}
           </div>
           <div className="table-wrapper">
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Start time</TableCell>
-                  <TableCell numeric>Head count</TableCell>
-                  <TableCell>Type</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('video_title_long')}>Title</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('datostempel')}>Date</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('datostempel')}>Start time</TableCell>
+                  <TableCell numeric onClick={() => this.props.sortByAttr('count')}>Head count</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('video_typeid')}>Type</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -108,25 +113,23 @@ export default class StatsTable extends PureComponent {
       report = (
         <Fragment>
           <h1>Class title report </h1>
-          <div className="flex">
+          <div className="flex export-wrapper">
             <p>
               This report shows the total number of views for each title within
               the selected timeframe.
             </p>
-            <Button style={{ marginLeft: "auto" }} onClick={this.exportData}>
-              EXPORT <ImportExport style={{ marginLeft: 15 }} />
-            </Button>
+            {exportVar}
           </div>
           <div className="table-wrapper">
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Level</TableCell>
-                  <TableCell>Provider</TableCell>
-                  <TableCell numeric>Views</TableCell>
-                  <TableCell numeric>Count</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('video_title_long')}>Title</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('video_category')}>Category</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('video_level')}>Level</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('providername')}>Provider</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('views')} numeric>Views</TableCell>
+                  <TableCell onClick={() => this.props.sortByAttr('count')} numeric>Count</TableCell>
                   <TableCell numeric>Avg</TableCell>
                 </TableRow>
               </TableHead>

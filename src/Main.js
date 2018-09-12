@@ -52,7 +52,8 @@ class App extends Component {
     loading: true,
     custom_start_date: "",
     custom_end_date: "",
-    players: []
+    players: [],
+    desc: false
   };
 
   async componentDidMount() {
@@ -205,6 +206,21 @@ class App extends Component {
     this.setState({ customDateEl: event.target });
   };
 
+  sortByAttr = (title) => {
+    const data = [...this.state.data];
+    const sortedArr = data.sort((a, b) => this.sort(a, b, title, this.state.desc));
+    this.setState({ data: sortedArr, desc: !this.state.desc });
+  }
+
+  sort = (a, b, orderBy, desc) => {
+    if (desc) {
+      return a[orderBy] > b[orderBy] ? 1 : a[orderBy] < b[orderBy] ? -1 : 0;
+    }
+    else {
+      return a[orderBy] > b[orderBy] ? -1 : a[orderBy] < b[orderBy] ? 1 : 0;
+    }
+  }
+
   render() {
     const {
       data,
@@ -352,13 +368,13 @@ class App extends Component {
           </Button>
         )}
         {report !== "calendar_report" ? (
-          <StatsTable data={data} report={report} />
+          <StatsTable data={data} report={report} sortByAttr={this.sortByAttr} />
         ) : (
             <Calendar data={data} setInterval={this.setInterval} />
           )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card>
-            <CardContent>
+            <CardContent className="flex">
               <TextField
                 type="date"
                 name="custom_start_date"

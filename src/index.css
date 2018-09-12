@@ -29,3 +29,9 @@ body {
 .table-wrapper {
   overflow-x: auto;
 }
+
+@media (max-width: 1000px){
+  .flex{
+    flex-flow: wrap column;
+  }
+}
