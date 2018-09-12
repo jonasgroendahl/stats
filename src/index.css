@@ -25,3 +25,7 @@ body {
 #calendar .fc-event .fc-bg{
   opacity: 0;
 }
+
+.table-wrapper {
+  overflow-x: auto;
+}

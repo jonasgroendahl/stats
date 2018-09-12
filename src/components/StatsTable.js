@@ -72,34 +72,36 @@ export default class StatsTable extends PureComponent {
               EXPORT <ImportExport style={{ marginLeft: 15 }} />
             </Button>
           </div>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Start time</TableCell>
-                <TableCell numeric>Head count</TableCell>
-                <TableCell>Type</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.props.data.map(dataEntry => (
+          <div className="table-wrapper">
+            <Table>
+              <TableHead>
                 <TableRow>
-                  <TableCell>{dataEntry.video_title_long}</TableCell>
-                  <TableCell>
-                    {format(new Date(dataEntry.datostempel), "dddd Do MMMM")}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(dataEntry.datostempel), "HH:mm")}
-                  </TableCell>
-                  <TableCell numeric>{dataEntry.count}</TableCell>
-                  <TableCell>
-                    {dataEntry.video_typeid === 100 ? "Live" : dataEntry.ondemand_selections ? "On-Demand" : "Scheduled"}
-                  </TableCell>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Start time</TableCell>
+                  <TableCell numeric>Head count</TableCell>
+                  <TableCell>Type</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {this.props.data.map(dataEntry => (
+                  <TableRow>
+                    <TableCell>{dataEntry.video_title_long}</TableCell>
+                    <TableCell>
+                      {format(new Date(dataEntry.datostempel), "dddd Do MMMM")}
+                    </TableCell>
+                    <TableCell>
+                      {format(new Date(dataEntry.datostempel), "HH:mm")}
+                    </TableCell>
+                    <TableCell numeric>{dataEntry.count}</TableCell>
+                    <TableCell>
+                      {dataEntry.video_typeid === 100 ? "Live" : dataEntry.ondemand_selections ? "On-Demand" : "Scheduled"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </Fragment>
       );
     } else if (this.props.report === "class_report") {
@@ -115,32 +117,34 @@ export default class StatsTable extends PureComponent {
               EXPORT <ImportExport style={{ marginLeft: 15 }} />
             </Button>
           </div>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Category</TableCell>
-                <TableCell>Level</TableCell>
-                <TableCell>Provider</TableCell>
-                <TableCell numeric>Views</TableCell>
-                <TableCell numeric>Count</TableCell>
-                <TableCell numeric>Avg</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {this.props.data.map(dataEntry => (
+          <div className="table-wrapper">
+            <Table>
+              <TableHead>
                 <TableRow>
-                  <TableCell>{dataEntry.video_title_long}</TableCell>
-                  <TableCell>{this.mapCategory(dataEntry.video_category)}</TableCell>
-                  <TableCell>{dataEntry.video_level}</TableCell>
-                  <TableCell>{dataEntry.providername}</TableCell>
-                  <TableCell numeric>{dataEntry.views}</TableCell>
-                  <TableCell numeric>{dataEntry.count}</TableCell>
-                  <TableCell numeric>{(dataEntry.count / dataEntry.views).toFixed(2)}</TableCell>
+                  <TableCell>Title</TableCell>
+                  <TableCell>Category</TableCell>
+                  <TableCell>Level</TableCell>
+                  <TableCell>Provider</TableCell>
+                  <TableCell numeric>Views</TableCell>
+                  <TableCell numeric>Count</TableCell>
+                  <TableCell numeric>Avg</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {this.props.data.map(dataEntry => (
+                  <TableRow>
+                    <TableCell>{dataEntry.video_title_long}</TableCell>
+                    <TableCell>{this.mapCategory(dataEntry.video_category)}</TableCell>
+                    <TableCell>{dataEntry.video_level}</TableCell>
+                    <TableCell>{dataEntry.providername}</TableCell>
+                    <TableCell numeric>{dataEntry.views}</TableCell>
+                    <TableCell numeric>{dataEntry.count}</TableCell>
+                    <TableCell numeric>{(dataEntry.count / dataEntry.views).toFixed(2)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </Fragment>
       );
     }

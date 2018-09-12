@@ -220,7 +220,7 @@ class App extends Component {
       custom_start_date
     } = this.state;
     return (
-      <div className="App stats-container">
+      <div className="stats-container">
         <p>Gym name: {' '} {this.state.gymName}</p>
         <p>Count sensors available:</p>
         {this.state.sensors.map(sensor => <p>Sensor: {' '}{sensor.name}</p>)}
