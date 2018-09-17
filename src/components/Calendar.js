@@ -45,10 +45,7 @@ export default class CalendarComponent extends PureComponent {
           view.start.format("YYYY-MM-DD"),
           view.end.format("YYYY-MM-DD")
         );
-        this.props.setInterval(
-          view.start.format("YYYY-MM-DD"),
-          view.end.format("YYYY-MM-DD")
-        );
+        this.props.setInterval(view.start.toDate(), view.end.toDate());
       }
     };
     this.calendar = new Calendar(div, options);

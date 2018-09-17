@@ -113,11 +113,11 @@ class App extends Component {
       start:
         this.state.interval !== "custom"
           ? this.state.start_date
-          : this.state.custom_start_date,
+          : format(this.state.custom_start_date, "YYYY-MM-DD"),
       end:
         this.state.interval !== "custom"
           ? this.state.end_date
-          : this.state.custom_end_date,
+          : format(this.state.custom_end_date, "YYYY-MM-DD"),
       zoneid: this.state.zoneId,
       token: this.state.token,
       type: this.state.type
@@ -204,7 +204,7 @@ class App extends Component {
 
   handlePlayerChange = event => {
     this.setState({ playerId: event.target.value }, () => {
-      if (report === "calendar_report") {
+      if (this.state.report === "calendar_report") {
         this.getData();
       }
     });
@@ -241,11 +241,7 @@ class App extends Component {
 
   toggleDatepicker = event => {
     console.log("Toggling datepicker");
-    this.setState({ customDateEl: event.target }, () =>
-      console.log(this.customStartDate)
-    );
-    console.log(this.customStartDate);
-    setTimeout(() => console.log(this.customStartDate), 2000);
+    this.setState({ customDateEl: event.target });
   };
 
   sortByAttr = title => {
