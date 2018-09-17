@@ -55,7 +55,7 @@ export default class StatsTable extends PureComponent {
     } else {
       mappedData = this.props.data.map(dataEntry => ({
         title: dataEntry.video_title_long,
-        category: this.mapCategory(dataEntry.video_category),
+        category: this.props.mapCategory(dataEntry.video_category),
         level: dataEntry.video_level,
         provider: dataEntry.providername,
         views: dataEntry.views,

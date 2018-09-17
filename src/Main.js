@@ -429,6 +429,7 @@ class App extends Component {
             data={data}
             report={report}
             sortByAttr={this.sortByAttr}
+            mapCategory={this.mapCategory}
           />
         ) : (
           <Calendar data={data} setInterval={this.setInterval} />
