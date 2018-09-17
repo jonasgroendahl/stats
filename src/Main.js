@@ -203,7 +203,11 @@ class App extends Component {
   };
 
   handlePlayerChange = event => {
-    this.setState({ playerId: event.target.value }, () => this.getData());
+    this.setState({ playerId: event.target.value }, () => {
+      if (report === "calendar_report") {
+        this.getData();
+      }
+    });
   };
 
   handleDateChange = event => {
