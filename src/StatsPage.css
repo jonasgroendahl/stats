@@ -23,3 +23,17 @@
 .row {
   flex-flow: wrap row !important;
 }
+
+.react-calendar {
+  border: none !important;
+}
+
+.small-svg {
+  width: 20px !important;
+  height: 20px !important;
+  margin-left: 2px;
+}
+
+.fc-event .fc-content {
+  padding: 5px;
+}

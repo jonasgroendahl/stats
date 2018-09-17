@@ -5,44 +5,54 @@ import {
   TableHead,
   TableCell,
   TableBody,
-  TableRow
+  TableRow,
+  TableSortLabel,
+  Tooltip
 } from "@material-ui/core";
-import { ImportExport } from "@material-ui/icons";
+import ExportArrow from "@material-ui/icons/ArrowDropDownCircle";
+import { Info } from "@material-ui/icons";
 import { format } from "date-fns";
 import XlsExport from "xlsexport";
 
 export default class StatsTable extends PureComponent {
-
-  mapCategory = (category) => {
-    switch (category) {
-      case 'D':
-        return 'Mind Body';
-      case 'S':
-        return 'Conditioning';
-      case 'W':
-        return 'Cardio';
-      case 'C':
-        return 'Cycling';
-      case 'K':
-        return 'Kids';
-      default:
-        return 'Senior';
-    }
-  }
+  state = {
+    orderBy: "",
+    orderDirection: "asc",
+    class_report_attr: [
+      { value: "video_title_long", text: "Title" },
+      { value: "video_category", text: "Category" },
+      { value: "video_level", text: "Level" },
+      { value: "providername", text: "Provider" },
+      { value: "views", text: "Views" },
+      { value: "count", text: "Count" },
+      { value: "avg", text: "Avg" }
+    ],
+    schedule_report_attr: [
+      { value: "video_title_long", text: "Title" },
+      { value: "datostempel", text: "Date" },
+      { value: "datostempel", text: "Start" },
+      { value: "count", text: "Count" },
+      { value: "type", text: "Type" }
+    ]
+  };
 
   exportData = () => {
-    console.log('exporting data');
+    console.log("exporting data");
     let mappedData = null;
-    if (this.props.report === 'schedule_report') {
+    if (this.props.report === "schedule_report") {
       mappedData = this.props.data.map(dataEntry => ({
         title: dataEntry.video_title_long,
         date: format(new Date(dataEntry.datostempel), "dddd Do MMMM"),
         start: format(new Date(dataEntry.datostempel), "HH:mm"),
         count: dataEntry.count,
-        type: dataEntry.video_typeid === 100 ? "Live" : dataEntry.ondemand_selections ? "On-Demand" : "Scheduled"
-      }))
-    }
-    else {
+        type:
+          dataEntry.video_typeid === 100
+            ? "Live"
+            : dataEntry.ondemand_selections
+              ? "On-Demand"
+              : "Scheduled"
+      }));
+    } else {
       mappedData = this.props.data.map(dataEntry => ({
         title: dataEntry.video_title_long,
         category: this.mapCategory(dataEntry.video_category),
@@ -51,21 +61,35 @@ export default class StatsTable extends PureComponent {
         views: dataEntry.views,
         count: dataEntry.count,
         avg: (dataEntry.count / dataEntry.views).toFixed(2)
-      }))
+      }));
     }
-    const xls = new XlsExport(mappedData, 'Stats report');
-    xls.exportToXLS('stats_export.xls');
-  }
+    const xls = new XlsExport(mappedData, "Stats report");
+    xls.exportToXLS("stats_export.xls");
+  };
 
-
-
+  orderBy = attr => {
+    let order = "asc";
+    if (this.state.orderDirection === "asc") {
+      order = "desc";
+    }
+    this.setState({ orderBy: attr, orderDirection: order });
+    this.props.sortByAttr(attr);
+  };
 
   render() {
+    const {
+      orderBy,
+      orderDirection,
+      class_report_attr,
+      schedule_report_attr
+    } = this.state;
+
     let report = null;
-    const exportVar =
+    const exportVar = (
       <Button style={{ marginLeft: "auto" }} onClick={this.exportData}>
-        EXPORT <ImportExport style={{ marginLeft: 15 }} />
-      </Button>;
+        EXPORT <ExportArrow style={{ marginLeft: 15 }} />
+      </Button>
+    );
     if (this.props.report === "schedule_report") {
       report = (
         <Fragment>
@@ -81,16 +105,24 @@ export default class StatsTable extends PureComponent {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell onClick={() => this.props.sortByAttr('video_title_long')}>Title</TableCell>
-                  <TableCell onClick={() => this.props.sortByAttr('datostempel')}>Date</TableCell>
-                  <TableCell onClick={() => this.props.sortByAttr('datostempel')}>Start time</TableCell>
-                  <TableCell numeric onClick={() => this.props.sortByAttr('count')}>Head count</TableCell>
-                  <TableCell onClick={() => this.props.sortByAttr('video_typeid')}>Type</TableCell>
+                  {schedule_report_attr.map(attr => (
+                    <TableCell
+                      onClick={() => this.orderBy(attr.value)}
+                      numeric={attr.value === "count"}
+                    >
+                      <TableSortLabel
+                        direction={orderDirection}
+                        active={orderBy === attr.value}
+                      >
+                        {attr.text}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {this.props.data.map(dataEntry => (
-                  <TableRow>
+                  <TableRow hover>
                     <TableCell>{dataEntry.video_title_long}</TableCell>
                     <TableCell>
                       {format(new Date(dataEntry.datostempel), "dddd Do MMMM")}
@@ -100,7 +132,11 @@ export default class StatsTable extends PureComponent {
                     </TableCell>
                     <TableCell numeric>{dataEntry.count}</TableCell>
                     <TableCell>
-                      {dataEntry.video_typeid === 100 ? "Live" : dataEntry.ondemand_selections ? "On-Demand" : "Scheduled"}
+                      {dataEntry.video_typeid === 100
+                        ? "Live"
+                        : dataEntry.ondemand_selections
+                          ? "On-Demand"
+                          : "Scheduled"}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -124,25 +160,34 @@ export default class StatsTable extends PureComponent {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell onClick={() => this.props.sortByAttr('video_title_long')}>Title</TableCell>
-                  <TableCell onClick={() => this.props.sortByAttr('video_category')}>Category</TableCell>
-                  <TableCell onClick={() => this.props.sortByAttr('video_level')}>Level</TableCell>
-                  <TableCell onClick={() => this.props.sortByAttr('providername')}>Provider</TableCell>
-                  <TableCell onClick={() => this.props.sortByAttr('views')} numeric>Views</TableCell>
-                  <TableCell onClick={() => this.props.sortByAttr('count')} numeric>Count</TableCell>
-                  <TableCell numeric>Avg</TableCell>
+                  {class_report_attr.map(attr => (
+                    <TableCell onClick={() => this.orderBy(attr.value)}>
+                      <TableSortLabel
+                        active={orderBy === attr.value}
+                        direction={orderDirection}
+                      >
+                        {attr.text}
+                        {attr.value === "count" && (
+                          <Tooltip title="Wall of text here">
+                            <Info className="small-svg" />
+                          </Tooltip>
+                        )}
+                        {attr.value === "avg" && (
+                          <Tooltip title="Wall of text here 2">
+                            <Info className="small-svg" />
+                          </Tooltip>
+                        )}
+                      </TableSortLabel>
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
                 {this.props.data.map(dataEntry => (
-                  <TableRow>
-                    <TableCell>{dataEntry.video_title_long}</TableCell>
-                    <TableCell>{this.mapCategory(dataEntry.video_category)}</TableCell>
-                    <TableCell>{dataEntry.video_level}</TableCell>
-                    <TableCell>{dataEntry.providername}</TableCell>
-                    <TableCell numeric>{dataEntry.views}</TableCell>
-                    <TableCell numeric>{dataEntry.count}</TableCell>
-                    <TableCell numeric>{(dataEntry.count / dataEntry.views).toFixed(2)}</TableCell>
+                  <TableRow hover>
+                    {class_report_attr.map(attr => (
+                      <TableCell>{dataEntry[attr.value]}</TableCell>
+                    ))}
                   </TableRow>
                 ))}
               </TableBody>

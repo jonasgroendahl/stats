@@ -4,25 +4,25 @@ body {
   font-family: sans-serif;
 }
 
-.full-width{
-  width:100%;
+.full-width {
+  width: 100%;
 }
 
-.ml-auto{
-  margin-left:auto;
+.ml-auto {
+  margin-left: auto;
 }
 
-.calendar-wrapper{
+.calendar-wrapper {
   margin-top: 10px;
   height: calc(100vh - 300px);
 }
 
-#calendar .fc-event{
+#calendar .fc-event {
   background-color: rgb(47, 47, 47);
-  border-color: rgb(47, 47, 47);
+  border: none;
 }
 
-#calendar .fc-event .fc-bg{
+#calendar .fc-event .fc-bg {
   opacity: 0;
 }
 
@@ -30,8 +30,8 @@ body {
   overflow-x: auto;
 }
 
-@media (max-width: 1000px){
-  .flex{
+@media (max-width: 1000px) {
+  .flex {
     flex-flow: wrap column;
   }
 }

@@ -15,10 +15,12 @@ import {
   TextField,
   Popper,
   Card,
-  CardContent
+  CardContent,
+  CardActions
 } from "@material-ui/core";
 import api from "./config/api";
 import { subDays, format } from "date-fns";
+import Datepicker from "react-calendar";
 
 class App extends Component {
   state = {
@@ -41,13 +43,13 @@ class App extends Component {
     type: "all",
     show: "All",
     customDateEl: null,
-    start_date: "",
-    end_date: "",
+    start_date: format(subDays(new Date(), 7), "YYYY-MM-DD"),
+    end_date: format(new Date(), "YYYY-MM-DD"),
     gymId: 1060,
-    gymName: '',
+    gymName: "",
     sensors: [],
     token: 0,
-    playerId: 1994,
+    playerId: 0,
     zoneId: 5970,
     loading: true,
     custom_start_date: "",
@@ -63,41 +65,25 @@ class App extends Component {
         this.setState({ players: result.data });
       }
     });
-    let gymName = '';
+    let gymName = "";
     let sensors = [];
     let zoneId = 5970;
-    let playerId = 1994;
     if (resultSensors.data.length > 0) {
       console.log("Sensors found for client");
       gymName = resultSensors.data[0].firmanavn;
       sensors = resultSensors.data;
       zoneId = resultSensors.data[0].zone_id;
-      playerId = resultSensors.data[0].player_id;
     }
-    const token = await this.getToken();
-    const body = {
-      kundeid: this.state.gymId,
-      start: "2018-08-22",
-      end: "2018-08-29",
-      zoneid: zoneId,
-      token: token
-    };
-    const result = await api.post(
-      `/v2/stats?summed=1&gym_id=${this.state.gymId}`,
-      body
+    await this.getToken();
+    this.setState(
+      {
+        loading: false,
+        sensors,
+        gymName,
+        zoneId
+      },
+      () => this.getData()
     );
-    const startdate = format(subDays(new Date(), 7), "YYYY-MM-DD");
-    const enddate = format(new Date(), "YYYY-MM-DD");
-    this.setState({
-      data: result.data,
-      loading: false,
-      start_date: startdate,
-      end_date: enddate,
-      sensors,
-      gymName,
-      playerId,
-      zoneId
-    });
     setInterval(() => {
       this.getToken();
       console.log("Getting a new token");
@@ -110,13 +96,15 @@ class App extends Component {
       this.setState({ token: result.data.access_token });
       resolve(result.data.access_token);
     });
-  }
+  };
 
   handleReportChange = event => {
     console.log("handleReportChange");
+    if (event.target.value == "calendar_report") {
+      this.setState({ playerId: this.state.players[1].identitetid });
+    }
     this.setState({ report: event.target.value }, () => this.getData());
   };
-
 
   getData = async () => {
     this.setState({ loading: true });
@@ -138,28 +126,64 @@ class App extends Component {
     if (this.state.report === "schedule_report") {
       if (this.state.token) {
         dataResponse = await api.post(
-          `/v2/stats?gym_id=${this.state.gymId}`,
+          `/v2/stats?gym_id=${this.state.gymId}&identitetid=${
+            this.state.playerId
+          }`,
           body
         );
       } else {
         dataResponse = await api.get(`/v2/stats`);
       }
     } else if (this.state.report === "class_report") {
-      dataResponse = await api.post(
-        `/v2/stats?summed=1&gym_id=${this.state.gymId}`,
-        body
-      );
+      try {
+        dataResponse = await api.post(
+          `/v2/stats?summed=1&gym_id=${this.state.gymId}&identitetid=${
+            this.state.playerId
+          }`,
+          body
+        );
+      } catch (e) {
+        console.log("Error", e);
+      }
     } else if (this.state.report === "calendar_report") {
-      body.type = 'scheduled';
+      body.type = "scheduled";
       dataResponse = await api.post(
         `/v2/stats?&identitetid=${this.state.playerId}&gym_id=${
-        this.state.gymId
+          this.state.gymId
         }`,
         body
       );
     }
     console.log("Data retrieval", dataResponse.data);
-    this.setState({ data: dataResponse.data, loading: false });
+    const formattedData = dataResponse.data
+      .map(stat => {
+        return {
+          ...stat,
+          video_category: this.mapCategory(stat.video_category),
+          avg: (stat.count / stat.views).toFixed(2)
+        };
+      })
+      .sort((a, b) => (a.views > b.views ? -1 : 1));
+    this.setState({ data: formattedData, loading: false });
+  };
+
+  mapCategory = category => {
+    switch (category) {
+      case "D":
+        return "Mind Body";
+      case "S":
+        return "Conditioning";
+      case "W":
+        return "Cardio";
+      case "C":
+        return "Cycling";
+      case "K":
+        return "Kids";
+      case "G":
+        return "Senior";
+      default:
+        return "Live";
+    }
   };
 
   setInterval = (start, end) => {
@@ -170,7 +194,12 @@ class App extends Component {
   };
 
   handleChange = event => {
+    console.log("handleChange", event.target.name, event.target.value);
     this.setState({ [event.target.name]: event.target.value });
+  };
+
+  handleDatePickerChange = (value, name) => {
+    this.setState({ [name]: value });
   };
 
   handlePlayerChange = event => {
@@ -178,6 +207,7 @@ class App extends Component {
   };
 
   handleDateChange = event => {
+    console.log("handleDateChange", event.target.value);
     const end = format(new Date(), "YYYY-MM-DD");
     let start;
     switch (event.target.value) {
@@ -194,32 +224,43 @@ class App extends Component {
         start = format(subDays(new Date(), 7), "YYYY-MM-DD");
         break;
     }
+    console.log(event.target.value !== "custom");
     this.setState({
       start_date: start,
       end_date: end,
       interval: event.target.value
     });
+    if (event.target.value !== "custom") {
+      this.setState({ customDateEl: null });
+    }
   };
 
   toggleDatepicker = event => {
     console.log("Toggling datepicker");
-    this.setState({ customDateEl: event.target });
+    this.setState({ customDateEl: event.target }, () =>
+      console.log(this.customStartDate)
+    );
+    console.log(this.customStartDate);
+    setTimeout(() => console.log(this.customStartDate), 2000);
   };
 
-  sortByAttr = (title) => {
+  sortByAttr = title => {
     const data = [...this.state.data];
-    const sortedArr = data.sort((a, b) => this.sort(a, b, title, this.state.desc));
+    const sortedArr = data.sort((a, b) =>
+      this.sort(a, b, title, this.state.desc)
+    );
     this.setState({ data: sortedArr, desc: !this.state.desc });
-  }
+  };
 
   sort = (a, b, orderBy, desc) => {
     if (desc) {
       return a[orderBy] > b[orderBy] ? 1 : a[orderBy] < b[orderBy] ? -1 : 0;
-    }
-    else {
+    } else {
       return a[orderBy] > b[orderBy] ? -1 : a[orderBy] < b[orderBy] ? 1 : 0;
     }
-  }
+  };
+
+  customStartDate = React.createRef();
 
   render() {
     const {
@@ -237,9 +278,11 @@ class App extends Component {
     } = this.state;
     return (
       <div className="stats-container">
-        <p>Gym name: {' '} {this.state.gymName}</p>
+        <p>Gym name: {this.state.gymName}</p>
         <p>Count sensors available:</p>
-        {this.state.sensors.map(sensor => <p>Sensor: {' '}{sensor.name}</p>)}
+        {this.state.sensors.map(sensor => (
+          <p>Sensor: {sensor.name}</p>
+        ))}
         <Grid container style={{ marginBottom: 12 }}>
           <Grid item xs={6}>
             <FormLabel component="legend">Select Report</FormLabel>
@@ -259,18 +302,25 @@ class App extends Component {
             </Select>
           </Grid>
         </Grid>
-        {report === "calendar_report" && (
-          <Grid container style={{ marginBottom: 12 }}>
-            <Grid item xs={6}>
-              <FormLabel component="legend">Select Player</FormLabel>
-            </Grid>
-            <Grid item xs={6}>
-              <Select onChange={this.handlePlayerChange} value={playerId} fullWidth>
-                {this.state.players.map(player => <MenuItem value={player.identitetid}>{player.navn}</MenuItem>)}
-              </Select>
-            </Grid>
+        <Grid container style={{ marginBottom: 12 }}>
+          <Grid item xs={6}>
+            <FormLabel component="legend">Select Player</FormLabel>
           </Grid>
-        )}
+          <Grid item xs={6}>
+            <Select
+              onChange={this.handlePlayerChange}
+              value={playerId}
+              fullWidth
+            >
+              {report !== "calendar_report" && (
+                <MenuItem value={0}>All</MenuItem>
+              )}
+              {this.state.players.map(player => (
+                <MenuItem value={player.identitetid}>{player.navn}</MenuItem>
+              ))}
+            </Select>
+          </Grid>
+        </Grid>
         {report !== "calendar_report" && (
           <Grid container>
             <Grid item xs={6}>
@@ -286,24 +336,27 @@ class App extends Component {
                 <FormControlLabel
                   value="1 week"
                   control={<Radio />}
-                  label="1 week"
+                  label="Last 7 days"
                 />
                 <FormControlLabel
                   value="3 weeks"
                   control={<Radio />}
-                  label="3 weeks"
+                  label="Last 30 days"
                 />
                 <FormControlLabel
                   value="3 months"
                   control={<Radio />}
-                  label="3 months"
+                  label="Last 90 days"
                 />
                 <FormControlLabel
                   control={<Radio onClick={this.toggleDatepicker} />}
                   label={
                     customDateEl ||
-                      (custom_start_date !== "" && custom_end_date !== "")
-                      ? `${custom_start_date} - ${custom_end_date}`
+                    (custom_start_date !== "" && custom_end_date !== "")
+                      ? `${format(custom_start_date, "YYYY-MM-DD")} - ${format(
+                          custom_end_date,
+                          "YYYY-MM-DD"
+                        )}`
                       : "Custom"
                   }
                   value="custom"
@@ -312,7 +365,7 @@ class App extends Component {
             </Grid>
           </Grid>
         )}
-        {report !== 'calendar_report' &&
+        {report !== "calendar_report" && (
           <Grid container>
             <Grid item xs={6}>
               <FormLabel component="legend">Type</FormLabel>
@@ -330,7 +383,11 @@ class App extends Component {
                   control={<Radio />}
                   label="Scheduled"
                 />
-                <FormControlLabel value="live" control={<Radio />} label="Live" />
+                <FormControlLabel
+                  value="live"
+                  control={<Radio />}
+                  label="Live"
+                />
                 <FormControlLabel
                   value="ondemand"
                   control={<Radio />}
@@ -339,7 +396,7 @@ class App extends Component {
               </RadioGroup>
             </Grid>
           </Grid>
-        }
+        )}
         {report !== "calendar_report" && (
           <Grid container>
             <Grid item xs={6}>
@@ -368,24 +425,46 @@ class App extends Component {
           </Button>
         )}
         {report !== "calendar_report" ? (
-          <StatsTable data={data} report={report} sortByAttr={this.sortByAttr} />
+          <StatsTable
+            data={data}
+            report={report}
+            sortByAttr={this.sortByAttr}
+          />
         ) : (
-            <Calendar data={data} setInterval={this.setInterval} />
-          )}
+          <Calendar data={data} setInterval={this.setInterval} />
+        )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card>
-            <CardContent className="flex">
-              <TextField
-                type="date"
-                name="custom_start_date"
-                onChange={this.handleChange}
-                style={{ marginRight: 10 }}
-              />
-              <TextField
-                type="date"
-                name="custom_end_date"
-                onChange={this.handleChange}
-              />
+            <CardContent className="flex" id="test">
+              <div style={{ marginRight: 25 }}>
+                <TextField
+                  name="custom_start_date"
+                  disabled
+                  label="From"
+                  value={format(custom_start_date, "YYYY-MM-DD")}
+                />
+                <Datepicker
+                  value={custom_start_date}
+                  onChange={value =>
+                    this.handleDatePickerChange(value, "custom_start_date")
+                  }
+                />
+              </div>
+              <div>
+                <TextField
+                  label="To"
+                  disabled
+                  value={format(custom_end_date, "YYYY-MM-DD")}
+                />
+                <Datepicker
+                  value={custom_end_date}
+                  onChange={value =>
+                    this.handleDatePickerChange(value, "custom_end_date")
+                  }
+                />
+              </div>
+            </CardContent>
+            <CardActions>
               <Button
                 onClick={() =>
                   this.setState({
@@ -405,7 +484,7 @@ class App extends Component {
               >
                 Apply
               </Button>
-            </CardContent>
+            </CardActions>
           </Card>
         </Popper>
         <LoadingModal open={this.state.loading} />
