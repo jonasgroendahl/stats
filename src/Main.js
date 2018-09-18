@@ -299,11 +299,11 @@ class App extends Component {
     } = this.state;
     return (
       <div className="stats-container">
-        <p>Gym name: {this.state.gymName}</p>
+        {/*<p>Gym name: {this.state.gymName}</p>
         <p>Count sensors available:</p>
         {this.state.sensors.map(sensor => (
           <p>Sensor: {sensor.name}</p>
-        ))}
+        ))}*/}
         <Grid container style={{ marginBottom: 12 }}>
           <Grid item xs={6}>
             <FormLabel component="legend">Select Report</FormLabel>
