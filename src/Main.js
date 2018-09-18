@@ -167,7 +167,8 @@ class App extends Component {
         return {
           ...stat,
           video_category: this.mapCategory(stat.video_category),
-          avg: (stat.count / stat.views).toFixed(2)
+          avg: (stat.count / stat.views).toFixed(2),
+          video_title_long: stat.video_title_long.replace(/[?]/g, "")
         };
       })
       .sort((a, b) => (a.views > b.views ? -1 : 1));
