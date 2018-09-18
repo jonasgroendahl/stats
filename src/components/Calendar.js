@@ -31,7 +31,7 @@ export default class CalendarComponent extends PureComponent {
         const strong = document.createElement("strong");
         strong.innerHTML = event.count;
         span.appendChild(strong);
-        if (event.count == 0) {
+        if (event.count === 0) {
           element.querySelector(".fc-bg").style.opacity = 0.5;
         } else if (event.count >= 0 && event.count <= 10) {
           element.querySelector(".fc-bg").style.opacity = 0.2;

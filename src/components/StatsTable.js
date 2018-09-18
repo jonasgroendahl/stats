@@ -7,7 +7,8 @@ import {
   TableBody,
   TableRow,
   TableSortLabel,
-  Tooltip
+  Tooltip,
+  SnackbarContent
 } from "@material-ui/core";
 import ExportArrow from "@material-ui/icons/ArrowDropDownCircle";
 import { Info } from "@material-ui/icons";
@@ -23,18 +24,41 @@ export default class StatsTable extends PureComponent {
       { value: "video_category", text: "Category" },
       { value: "video_level", text: "Level" },
       { value: "providername", text: "Provider" },
-      { value: "views", text: "Views" },
-      { value: "count", text: "Count" },
-      { value: "avg", text: "Avg" }
+      { value: "views", text: "Views" }
     ],
     schedule_report_attr: [
       { value: "video_title_long", text: "Title" },
       { value: "datostempel", text: "Date" },
       { value: "datostempel", text: "Start" },
-      { value: "count", text: "Count" },
+      { value: "count", text: "Head count" },
       { value: "type", text: "Type" }
     ]
   };
+
+  componentDidUpdate(props, _) {
+    if (
+      props.show !== this.props.show &&
+      this.props.report === "class_report"
+    ) {
+      if (this.props.show === "All") {
+        const attrs = this.state.class_report_attr.filter(
+          attr => attr.value !== "avg" && attr.value !== "count"
+        );
+        this.setState({ class_report_attr: attrs });
+      } else {
+        const attrs = [
+          { value: "video_title_long", text: "Title" },
+          { value: "video_category", text: "Category" },
+          { value: "video_level", text: "Level" },
+          { value: "providername", text: "Provider" },
+          { value: "views", text: "Views" },
+          { value: "count", text: "Count" },
+          { value: "avg", text: "Avg" }
+        ];
+        this.setState({ class_report_attr: attrs });
+      }
+    }
+  }
 
   exportData = () => {
     console.log("exporting data");
@@ -142,6 +166,9 @@ export default class StatsTable extends PureComponent {
                 ))}
               </TableBody>
             </Table>
+            {this.props.data.length === 0 && (
+              <SnackbarContent className="label" message="No results" />
+            )}
           </div>
         </Fragment>
       );
@@ -192,6 +219,9 @@ export default class StatsTable extends PureComponent {
                 ))}
               </TableBody>
             </Table>
+            {this.props.data.length === 0 && (
+              <SnackbarContent className="label" message="No results" />
+            )}
           </div>
         </Fragment>
       );

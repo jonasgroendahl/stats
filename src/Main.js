@@ -19,8 +19,9 @@ import {
   CardActions
 } from "@material-ui/core";
 import api from "./config/api";
-import { subDays, format } from "date-fns";
-import Datepicker from "react-calendar";
+import { subDays, format, addDays, differenceInDays } from "date-fns";
+import Datepicker from "react-day-picker";
+import "react-day-picker/lib/style.css";
 
 class App extends Component {
   state = {
@@ -45,7 +46,7 @@ class App extends Component {
     customDateEl: null,
     start_date: format(subDays(new Date(), 7), "YYYY-MM-DD"),
     end_date: format(new Date(), "YYYY-MM-DD"),
-    gymId: 1060,
+    gymId: 124, // 1060 Pure Gym
     gymName: "",
     sensors: [],
     token: 0,
@@ -59,6 +60,12 @@ class App extends Component {
   };
 
   async componentDidMount() {
+    if (window.location.search.includes("gym_id")) {
+      console.log("Found gym id!");
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get("gym_id");
+      await this.setState({ gymId: id });
+    }
     const resultSensors = await api.get(`/v2/gyms/${this.state.gymId}/sensors`);
     api.get(`/v2/gyms/${this.state.gymId}/players`).then(result => {
       if (result.data.length > 0) {
@@ -199,7 +206,19 @@ class App extends Component {
   };
 
   handleDatePickerChange = (value, name) => {
-    this.setState({ [name]: value });
+    const { custom_start_date, custom_end_date } = this.state;
+    console.log(value, name, differenceInDays(value, custom_end_date));
+    if (
+      (name === "custom_end_date" && value < custom_start_date) ||
+      Math.abs(differenceInDays(value, custom_start_date)) > 120
+    ) {
+    } else if (
+      (name === "custom_start_date" && value > custom_end_date) ||
+      Math.abs(differenceInDays(value, custom_end_date)) > 120
+    ) {
+    } else {
+      this.setState({ [name]: value });
+    }
   };
 
   handlePlayerChange = event => {
@@ -240,8 +259,11 @@ class App extends Component {
   };
 
   toggleDatepicker = event => {
-    console.log("Toggling datepicker");
-    this.setState({ customDateEl: event.target });
+    this.setState({
+      customDateEl: event.target,
+      custom_start_date: new Date(),
+      custom_end_date: addDays(new Date(), 1)
+    });
   };
 
   sortByAttr = title => {
@@ -259,8 +281,6 @@ class App extends Component {
       return a[orderBy] > b[orderBy] ? -1 : a[orderBy] < b[orderBy] ? 1 : 0;
     }
   };
-
-  customStartDate = React.createRef();
 
   render() {
     const {
@@ -430,6 +450,7 @@ class App extends Component {
             report={report}
             sortByAttr={this.sortByAttr}
             mapCategory={this.mapCategory}
+            show={show}
           />
         ) : (
           <Calendar data={data} setInterval={this.setInterval} />
@@ -445,8 +466,8 @@ class App extends Component {
                   value={format(custom_start_date, "YYYY-MM-DD")}
                 />
                 <Datepicker
-                  value={custom_start_date}
-                  onChange={value =>
+                  selectedDays={[custom_start_date]}
+                  onDayClick={value =>
                     this.handleDatePickerChange(value, "custom_start_date")
                   }
                 />
@@ -458,8 +479,8 @@ class App extends Component {
                   value={format(custom_end_date, "YYYY-MM-DD")}
                 />
                 <Datepicker
-                  value={custom_end_date}
-                  onChange={value =>
+                  selectedDays={[custom_end_date]}
+                  onDayClick={value =>
                     this.handleDatePickerChange(value, "custom_end_date")
                   }
                 />

@@ -30,6 +30,29 @@ body {
   overflow-x: auto;
 }
 
+.DayPicker {
+  display: block !important;
+}
+
+.DayPicker:focus {
+  outline: none !important;
+}
+
+DayPicker-wrapper:focus {
+  outline: none !important;
+}
+
+DayPicker-Months:focus {
+  outline: none !important;
+}
+
+.label {
+  margin-top: 25px !important;
+  background: red !important;
+  min-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 @media (max-width: 1000px) {
   .flex {
     flex-flow: wrap column;
