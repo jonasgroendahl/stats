@@ -24,7 +24,9 @@ export default class StatsTable extends PureComponent {
       { value: "video_category", text: "Category" },
       { value: "video_level", text: "Level" },
       { value: "providername", text: "Provider" },
-      { value: "views", text: "Views" }
+      { value: "views", text: "Views" },
+      { value: "count", text: "Count" },
+      { value: "avg", text: "Avg" }
     ],
     schedule_report_attr: [
       { value: "video_title_long", text: "Title" },
@@ -34,31 +36,6 @@ export default class StatsTable extends PureComponent {
       { value: "type", text: "Type" }
     ]
   };
-
-  componentDidUpdate(props, _) {
-    if (
-      props.show !== this.props.show &&
-      this.props.report === "class_report"
-    ) {
-      if (this.props.show === "All") {
-        const attrs = this.state.class_report_attr.filter(
-          attr => attr.value !== "avg" && attr.value !== "count"
-        );
-        this.setState({ class_report_attr: attrs });
-      } else {
-        const attrs = [
-          { value: "video_title_long", text: "Title" },
-          { value: "video_category", text: "Category" },
-          { value: "video_level", text: "Level" },
-          { value: "providername", text: "Provider" },
-          { value: "views", text: "Views" },
-          { value: "count", text: "Count" },
-          { value: "avg", text: "Avg" }
-        ];
-        this.setState({ class_report_attr: attrs });
-      }
-    }
-  }
 
   exportData = () => {
     console.log("exporting data");
@@ -195,12 +172,12 @@ export default class StatsTable extends PureComponent {
                       >
                         {attr.text}
                         {attr.value === "count" && (
-                          <Tooltip title="Wall of text here">
+                          <Tooltip title="This number represents the data gathered by your Wexer Count unit(s)">
                             <Info className="small-svg" />
                           </Tooltip>
                         )}
                         {attr.value === "avg" && (
-                          <Tooltip title="Wall of text here 2">
+                          <Tooltip title="This number represents your count data divided by the number of plays recorded for each class">
                             <Info className="small-svg" />
                           </Tooltip>
                         )}

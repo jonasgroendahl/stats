@@ -127,14 +127,15 @@ class App extends Component {
           : format(this.state.custom_end_date, "YYYY-MM-DD"),
       zoneid: this.state.zoneId,
       token: this.state.token,
-      type: this.state.type
+      type: this.state.type,
+      count_only: this.state.show === 'All' ? 0 : 1
     };
     console.log("Sending body", body);
     if (this.state.report === "schedule_report") {
       if (this.state.token) {
         dataResponse = await api.post(
           `/v2/stats?gym_id=${this.state.gymId}&identitetid=${
-            this.state.playerId
+          this.state.playerId
           }`,
           body
         );
@@ -145,7 +146,7 @@ class App extends Component {
       try {
         dataResponse = await api.post(
           `/v2/stats?summed=1&gym_id=${this.state.gymId}&identitetid=${
-            this.state.playerId
+          this.state.playerId
           }`,
           body
         );
@@ -156,7 +157,7 @@ class App extends Component {
       body.type = "scheduled";
       dataResponse = await api.post(
         `/v2/stats?&identitetid=${this.state.playerId}&gym_id=${
-          this.state.gymId
+        this.state.gymId
         }`,
         body
       );
@@ -373,11 +374,11 @@ class App extends Component {
                   control={<Radio onClick={this.toggleDatepicker} />}
                   label={
                     customDateEl ||
-                    (custom_start_date !== "" && custom_end_date !== "")
+                      (custom_start_date !== "" && custom_end_date !== "")
                       ? `${format(custom_start_date, "YYYY-MM-DD")} - ${format(
-                          custom_end_date,
-                          "YYYY-MM-DD"
-                        )}`
+                        custom_end_date,
+                        "YYYY-MM-DD"
+                      )}`
                       : "Custom"
                   }
                   value="custom"
@@ -454,8 +455,8 @@ class App extends Component {
             show={show}
           />
         ) : (
-          <Calendar data={data} setInterval={this.setInterval} />
-        )}
+            <Calendar data={data} setInterval={this.setInterval} />
+          )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card>
             <CardContent className="flex" id="test">
