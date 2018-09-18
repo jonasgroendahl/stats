@@ -6,12 +6,14 @@ import { format, addSeconds } from "date-fns";
 export default class CalendarComponent extends PureComponent {
   componentDidMount() {
     this.createCalendar();
+    this.first = false;
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.data.length !== this.props.data.length) {
       console.log("New events!");
       this.calendar.refetchEvents();
+
     }
   }
 
@@ -22,7 +24,9 @@ export default class CalendarComponent extends PureComponent {
       allDaySlot: false,
       height: "parent",
       events: this.fetchData,
-      slotDuration: "00:05:00",
+      slotDuration: "00:15:00",
+      minTime: '06:00:00',
+      maxTime: '24:00:00',
       eventRender: (event, element) => {
         const span = document.createElement("span");
         span.style.float = "right";
@@ -45,7 +49,10 @@ export default class CalendarComponent extends PureComponent {
           view.start.format("YYYY-MM-DD"),
           view.end.format("YYYY-MM-DD")
         );
-        this.props.setInterval(view.start.toDate(), view.end.toDate());
+        if (this.first) {
+          this.props.setInterval(view.start.toDate(), view.end.toDate());
+        }
+        this.first = true;
       }
     };
     this.calendar = new Calendar(div, options);
