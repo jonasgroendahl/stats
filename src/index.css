@@ -38,11 +38,11 @@ body {
   outline: none !important;
 }
 
-DayPicker-wrapper:focus {
+.DayPicker-wrapper:focus {
   outline: none !important;
 }
 
-DayPicker-Months:focus {
+.DayPicker-Months:focus {
   outline: none !important;
 }
 

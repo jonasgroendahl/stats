@@ -62,7 +62,6 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    const { gymId } = this.state;
 
     if (window.location.search) {
       const urlParams = new URLSearchParams(window.location.search);
@@ -71,8 +70,8 @@ class App extends Component {
       await this.setState({ gymId: id, isChain });
     }
 
-    const resultSensors = await WebAPI.getSensors(gymId);
-    const players = await WebAPI.getPlayers(gymId);
+    const resultSensors = await WebAPI.getSensors(this.state.gymId);
+    const players = await WebAPI.getPlayers(this.state.gymId);
 
     let isCountEnabled = false;
 
