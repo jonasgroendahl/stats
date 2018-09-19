@@ -481,8 +481,8 @@ class App extends Component {
                   this.setState({
                     customDateEl: null,
                     interval: "1 week",
-                    start_date: "",
-                    end_date: ""
+                    start_date: format(subDays(new Date(), 7), "YYYY-MM-DD"),
+                    end_date: format(new Date(), "YYYY-MM-DD")
                   })
                 }
               >
