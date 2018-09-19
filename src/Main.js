@@ -55,7 +55,8 @@ class App extends Component {
     custom_start_date: "",
     custom_end_date: "",
     players: [],
-    desc: false
+    desc: false,
+    isCountEnabled: false
   };
 
   async componentDidMount() {
@@ -67,9 +68,13 @@ class App extends Component {
     }
     const resultSensors = await api.get(`/v2/gyms/${this.state.gymId}/sensors`);
     const players = await api.get(`/v2/gyms/${this.state.gymId}/players`);
+    let isCountEnabled = false;
     if (players.data.length > 0) {
       const playersMapped = players.data.map(player => {
         const sensor = resultSensors.data.find(sensor => player.identitetid === sensor.player_id);
+        if (sensor && !isCountEnabled) {
+          isCountEnabled = true;
+        }
         return { ...player, zone_id: sensor ? sensor.zone_id : 0 };
       });
       this.setState({ players: playersMapped });
@@ -78,7 +83,8 @@ class App extends Component {
     this.setState(
       {
         loading: false,
-        sensors: resultSensors.data
+        sensors: resultSensors.data,
+        isCountEnabled
       },
       () => this.getData()
     );
@@ -98,13 +104,14 @@ class App extends Component {
 
   handleReportChange = event => {
     console.log("handleReportChange");
-    if (event.target.value == "calendar_report") {
+    if (event.target.value === "calendar_report") {
       this.setState({ playerId: this.state.players[1].identitetid });
     }
     this.setState({ report: event.target.value }, () => this.getData());
   };
 
-  getData = async () => {
+  /* setDefault is used for setting the proper playerId when switching to calendar view */
+  getData = async (setDefault) => {
     this.setState({ loading: true });
     let dataResponse;
     let body = {
@@ -141,6 +148,11 @@ class App extends Component {
       }
     } else if (this.state.report === "calendar_report") {
       body.type = "scheduled";
+      if (!setDefault) {
+        const player = this.state.players.find(pl => pl.zone_id !== 0);
+        console.log("Found a player", player);
+        await this.setState({ playerId: player.identitetid });
+      }
       dataResponse = await api.post(
         `/v2/stats?&identitetid=${this.state.playerId}&gym_id=${
         this.state.gymId
@@ -184,7 +196,7 @@ class App extends Component {
   setInterval = (start, end) => {
     this.setState(
       { custom_start_date: start, custom_end_date: end, interval: "custom" },
-      () => this.getData()
+      () => this.getData(false)
     );
   };
 
@@ -282,7 +294,8 @@ class App extends Component {
       customDateEl,
       playerId,
       custom_end_date,
-      custom_start_date
+      custom_start_date,
+      isCountEnabled
     } = this.state;
     return (
       <div className="stats-container">
@@ -304,9 +317,10 @@ class App extends Component {
             >
               <MenuItem value="class_report">Class title report</MenuItem>
               <MenuItem value="schedule_report">Schedule report</MenuItem>
-              <MenuItem value="calendar_report">
+              {isCountEnabled && <MenuItem value="calendar_report">
                 Wexer Count calendar report
               </MenuItem>
+              }
             </Select>
           </Grid>
         </Grid>
