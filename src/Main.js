@@ -142,7 +142,7 @@ class App extends Component {
         console.log("Found a player", player);
         await this.setState({ playerId: player.identitetid });
       }
-      dataResponse = await WebAPI.getScheduleReportData(token, gymId, playerId, start, end, 'scheduled', show, isChain);
+      dataResponse = await WebAPI.getScheduleReportData(token, gymId, this.state.playerId, start, end, 'scheduled', show, isChain);
     }
     console.log("Data retrieval", dataResponse.data);
     const formattedData = dataResponse.data
