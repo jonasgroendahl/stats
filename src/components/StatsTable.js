@@ -106,10 +106,11 @@ export default class StatsTable extends PureComponent {
             <Table>
               <TableHead>
                 <TableRow>
-                  {schedule_report_attr.map(attr => (
+                  {schedule_report_attr.map((attr, index) => (
                     <TableCell
                       onClick={() => this.orderBy(attr.value)}
                       numeric={attr.value === "count"}
+                      key={`h_${attr.value}_${index}`}
                     >
                       <TableSortLabel
                         direction={orderDirection}
@@ -122,8 +123,8 @@ export default class StatsTable extends PureComponent {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.props.data.map(dataEntry => (
-                  <TableRow hover>
+                {this.props.data.map((dataEntry, index) => (
+                  <TableRow hover key={index}>
                     <TableCell>{dataEntry.video_title_long}</TableCell>
                     <TableCell>
                       {format(new Date(dataEntry.datostempel), "dddd Do MMMM")}
@@ -165,7 +166,7 @@ export default class StatsTable extends PureComponent {
               <TableHead>
                 <TableRow>
                   {class_report_attr.map(attr => (
-                    <TableCell onClick={() => this.orderBy(attr.value)}>
+                    <TableCell onClick={() => this.orderBy(attr.value)} key={`h2_${attr.value}`}>
                       <TableSortLabel
                         active={orderBy === attr.value}
                         direction={orderDirection}
@@ -187,10 +188,10 @@ export default class StatsTable extends PureComponent {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.props.data.map(dataEntry => (
-                  <TableRow hover>
+                {this.props.data.map((dataEntry, index) => (
+                  <TableRow hover key={`${index}_${dataEntry.indslagid}`}>
                     {class_report_attr.map(attr => (
-                      <TableCell>{dataEntry[attr.value]}</TableCell>
+                      <TableCell key={`${attr.value}`}>{dataEntry[attr.value]}</TableCell>
                     ))}
                   </TableRow>
                 ))}

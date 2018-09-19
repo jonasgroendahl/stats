@@ -19,6 +19,7 @@ import {
   CardActions
 } from "@material-ui/core";
 import api from "./config/api";
+import WebAPI from "./js/api";
 import { subDays, format, addDays, differenceInDays } from "date-fns";
 import Datepicker from "react-day-picker";
 import "react-day-picker/lib/style.css";
@@ -42,7 +43,7 @@ class App extends Component {
     report: "class_report",
     interval: "1 week",
     type: "all",
-    show: "All",
+    show: '0',
     customDateEl: null,
     start_date: format(subDays(new Date(), 7), "YYYY-MM-DD"),
     end_date: format(new Date(), "YYYY-MM-DD"),
@@ -56,19 +57,25 @@ class App extends Component {
     custom_end_date: "",
     players: [],
     desc: false,
-    isCountEnabled: false
+    isCountEnabled: false,
+    isChain: 0
   };
 
   async componentDidMount() {
-    if (window.location.search.includes("gym_id")) {
-      console.log("Found gym id!");
+    const { gymId } = this.state;
+
+    if (window.location.search) {
       const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get("gym_id");
-      await this.setState({ gymId: id });
+      const id = urlParams.get("gym_id") ? urlParams.get('gym_id') : 124;
+      const isChain = urlParams.get('chain') ? 1 : 0;
+      await this.setState({ gymId: id, isChain });
     }
-    const resultSensors = await api.get(`/v2/gyms/${this.state.gymId}/sensors`);
-    const players = await api.get(`/v2/gyms/${this.state.gymId}/players`);
+
+    const resultSensors = await WebAPI.getSensors(gymId);
+    const players = await WebAPI.getPlayers(gymId);
+
     let isCountEnabled = false;
+
     if (players.data.length > 0) {
       const playersMapped = players.data.map(player => {
         const sensor = resultSensors.data.find(sensor => player.identitetid === sensor.player_id);
@@ -79,6 +86,7 @@ class App extends Component {
       });
       this.setState({ players: playersMapped });
     }
+
     await this.getToken();
     this.setState(
       {
@@ -88,6 +96,7 @@ class App extends Component {
       },
       () => this.getData()
     );
+
     setInterval(() => {
       this.getToken();
       console.log("Getting a new token");
@@ -113,52 +122,27 @@ class App extends Component {
   /* setDefault is used for setting the proper playerId when switching to calendar view */
   getData = async (setDefault) => {
     this.setState({ loading: true });
+
+    const { interval, type, token, show, custom_end_date, custom_start_date, gymId, players, playerId, report, start_date, end_date, isChain } = this.state;
+
     let dataResponse;
-    let body = {
-      start:
-        this.state.interval !== "custom"
-          ? this.state.start_date
-          : format(this.state.custom_start_date, "YYYY-MM-DD"),
-      end:
-        this.state.interval !== "custom"
-          ? this.state.end_date
-          : format(this.state.custom_end_date, "YYYY-MM-DD"),
-      token: this.state.token,
-      type: this.state.type,
-      count_only: this.state.show === 'All' ? 0 : 1
-    };
-    console.log("Sending body", body);
-    if (this.state.report === "schedule_report") {
-      dataResponse = await api.post(
-        `/v2/stats?gym_id=${this.state.gymId}&identitetid=${
-        this.state.playerId
-        }`,
-        body
-      );
-    } else if (this.state.report === "class_report") {
-      try {
-        dataResponse = await api.post(
-          `/v2/stats?summed=1&gym_id=${this.state.gymId}&identitetid=${
-          this.state.playerId
-          }`,
-          body
-        );
-      } catch (e) {
-        console.log("Error", e);
-      }
-    } else if (this.state.report === "calendar_report") {
-      body.type = "scheduled";
+
+    const start = interval !== "custom" ? start_date : format(custom_start_date, "YYYY-MM-DD");
+    const end = interval !== "custom" ? end_date : format(custom_end_date, "YYYY-MM-DD");
+
+    if (report === "schedule_report") {
+      dataResponse = await WebAPI.getScheduleReportData(token, gymId, playerId, start, end, type, show, isChain);
+    }
+    else if (report === "class_report") {
+      dataResponse = await WebAPI.getClassReportData(token, gymId, playerId, start, end, type, show, isChain);
+    }
+    else if (report === "calendar_report") {
       if (!setDefault) {
-        const player = this.state.players.find(pl => pl.zone_id !== 0);
+        const player = players.find(pl => pl.zone_id !== 0);
         console.log("Found a player", player);
         await this.setState({ playerId: player.identitetid });
       }
-      dataResponse = await api.post(
-        `/v2/stats?&identitetid=${this.state.playerId}&gym_id=${
-        this.state.gymId
-        }`,
-        body
-      );
+      dataResponse = await WebAPI.getScheduleReportData(token, gymId, playerId, start, end, 'scheduled', show, isChain);
     }
     console.log("Data retrieval", dataResponse.data);
     const formattedData = dataResponse.data
@@ -339,11 +323,11 @@ class App extends Component {
               )}
               {report !== 'calendar_report' ?
                 this.state.players.map(player => (
-                  <MenuItem value={player.identitetid}>{player.navn}</MenuItem>
+                  <MenuItem key={player.identitetid} value={player.identitetid}>{player.navn}</MenuItem>
                 )) :
                 this.state.players
                   .filter(pl => pl.zone_id !== 0)
-                  .map(player => <MenuItem value={player.identitetid}>{player.navn}</MenuItem>)}
+                  .map(player => <MenuItem value={player.identitetid} key={player.identitetid}>{player.navn}</MenuItem>)}
             </Select>
           </Grid>
         </Grid>
@@ -435,9 +419,9 @@ class App extends Component {
                 name="show"
                 value={show}
               >
-                <FormControlLabel value="All" control={<Radio />} label="All" />
+                <FormControlLabel value={'0'} control={<Radio />} label="All" />
                 <FormControlLabel
-                  value="Only Count enabled"
+                  value={'1'}
                   control={<Radio />}
                   label="Only Count enabled"
                 />
