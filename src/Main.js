@@ -537,10 +537,22 @@ class App extends Component {
                     console.log(value) || this.setState({ eventType: value })
                   }
                 >
-                  <BottomNavigationAction label="All" />
-                  <BottomNavigationAction label="Scheduled" />
-                  <BottomNavigationAction label="Live" />
-                  <BottomNavigationAction label="On Demand" />
+                  <BottomNavigationAction
+                    label="All"
+                    className={eventType === 0 && "selected"}
+                  />
+                  <BottomNavigationAction
+                    label="Scheduled"
+                    className={eventType === 1 && "selected"}
+                  />
+                  <BottomNavigationAction
+                    label="Live"
+                    className={eventType === 2 && "selected"}
+                  />
+                  <BottomNavigationAction
+                    label="On Demand"
+                    className={eventType === 3 && "selected"}
+                  />
                 </BottomNavigation>
               </div>
             </div>

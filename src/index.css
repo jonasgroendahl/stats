@@ -248,9 +248,10 @@ body {
 
 .bottom-nav span {
   font-size: 14px;
+  font-family: "Open Sans";
 }
 
-.bottom-nav .MuiBottomNavigationAction-selected-215 {
+.bottom-nav .selected span {
   color: var(--wteal);
 }
 
