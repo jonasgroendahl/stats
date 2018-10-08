@@ -1,15 +1,15 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: sans-serif;
+:root {
+  --wteal: #53dcb6;
+  --wteal-hover: #4ead91;
+  --svg-gray: #727271;
+  --gray: #9b9b9b;
+  --gray-d: #9d9d9d;
+  --gradient: linear-gradient(90deg, rgb(0, 223, 179), rgb(34, 198, 252));
+  --black: #3c3c3b;
 }
 
 .full-width {
   width: 100%;
-}
-
-.ml-auto {
-  margin-left: auto;
 }
 
 .calendar-wrapper {
@@ -46,11 +46,193 @@ body {
   outline: none !important;
 }
 
+.DayPicker-Month .DayPicker-Caption {
+  font-weight: bold;
+}
+
 .label {
   margin-top: 25px !important;
   background: red !important;
   min-width: 100% !important;
   box-sizing: border-box !important;
+}
+
+/* New additions 2018-10-08 */
+
+.DayPicker-Month .DayPicker-Caption {
+  display: none;
+}
+
+.DayPicker-Custom-Nav-Arrow {
+  color: var(--wteal);
+  cursor: pointer;
+}
+
+.DayPicker-Custom-Nav {
+  display: flex;
+  font-weight: bold;
+}
+
+.stats-container-row {
+  display: flex;
+  align-items: center;
+}
+
+.stats-container hr {
+  margin: 10px 0;
+}
+
+.stats-container-row > span {
+  margin-right: 20px;
+  color: var(--gray);
+}
+
+.stats-container-row div svg {
+  color: var(--wteal);
+}
+
+.ml-auto {
+  margin-left: auto !important;
+}
+
+.badge {
+  border-radius: 50%;
+  background-color: white;
+  color: var(--black);
+  width: 25px;
+  height: 25px;
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Open Sans";
+}
+
+.text--black {
+  color: var(--black) !important;
+}
+
+.text--teal {
+  color: var(--wteal) !important;
+}
+
+.text--gray {
+  color: var(--gray) !important;
+}
+
+.header {
+  font-family: Montserrat;
+  color: var(--black);
+  text-transform: uppercase;
+  font-size: 36px;
+  font-weight: 900;
+}
+
+.table-header {
+  font-family: Montserrat;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: var(--black);
+}
+
+.btn-flat {
+  color: var(--wteal);
+  background-color: transparent;
+  padding: 10px 30px;
+  border: 0;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+  font-family: Montserrat;
+  font-size: 14px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.btn {
+  background-color: var(--wteal);
+  color: white;
+  padding: 10px 30px;
+  border: 0;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+  font-family: Montserrat;
+  font-size: 14px;
+  min-width: 140px;
+  text-align: center;
+}
+
+.btn-icon {
+  color: var(--gray);
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+  font-family: Montserrat;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+}
+
+.btn:hover {
+  background: var(--wteal-hover);
+}
+
+.btn-icon:hover svg g {
+  fill: var(--wteal-hover);
+}
+
+.low {
+  background-color: #8bf1da !important;
+}
+
+.med {
+  background-color: #64d8b6 !important;
+}
+
+.med-high {
+  background-color: #4ead91 !important;
+}
+
+.high {
+  background-color: #377a66 !important;
+}
+
+.v-high {
+  background-color: #1d4137 !important;
+}
+
+.calendar-color-box {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.calendar-color-box {
+  margin-bottom: 10px;
+}
+
+.calendar-color-box > * {
+  width: 45px;
+  text-align: center;
+  color: white;
+  padding: 2px;
+  border-radius: 5px;
+  margin: 0 2px;
+}
+
+.table-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
 }
 
 @media (max-width: 1000px) {

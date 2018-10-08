@@ -13,7 +13,6 @@ export default class CalendarComponent extends PureComponent {
     if (prevProps.data.length !== this.props.data.length) {
       console.log("New events!");
       this.calendar.refetchEvents();
-
     }
   }
 
@@ -25,20 +24,27 @@ export default class CalendarComponent extends PureComponent {
       height: "parent",
       events: this.fetchData,
       slotDuration: "00:15:00",
-      minTime: '06:00:00',
-      maxTime: '24:00:00',
+      minTime: "06:00:00",
+      maxTime: "24:00:00",
+      header: false,
       eventRender: (event, element) => {
         const span = document.createElement("span");
         span.style.float = "right";
         span.style.margin = "2px";
-        span.innerHTML = "COUNT: ";
-        const strong = document.createElement("strong");
+        const strong = document.createElement("div");
+        strong.classList.add("badge");
         strong.innerHTML = event.count;
         span.appendChild(strong);
-        if (event.count === 0) {
-          element.querySelector(".fc-bg").style.opacity = 0.5;
+        if (event.count <= 0) {
+          element.classList.add("low");
         } else if (event.count >= 0 && event.count <= 10) {
-          element.querySelector(".fc-bg").style.opacity = 0.2;
+          element.classList.add("med");
+        } else if (event.count >= 11 && event.count <= 15) {
+          element.classList.add("med-high");
+        } else if (event.count >= 16 && event.count <= 20) {
+          element.classList.add("high");
+        } else {
+          element.classList.add("v-high");
         }
         element.querySelector(".fc-time").appendChild(span);
       },
@@ -81,6 +87,14 @@ export default class CalendarComponent extends PureComponent {
   render() {
     return (
       <div className="calendar-wrapper">
+        <div className="calendar-color-box">
+          <span className="text--gray">Key:</span>
+          <div className="low">0-5</div>
+          <div className="med">6-10</div>
+          <div className="med-high">11-15</div>
+          <div className="high">16-20</div>
+          <div className="v-high">20+</div>
+        </div>
         <div id="calendar" />
       </div>
     );

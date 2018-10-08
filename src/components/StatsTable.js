@@ -1,6 +1,5 @@
 import React, { PureComponent, Fragment } from "react";
 import {
-  Button,
   Table,
   TableHead,
   TableCell,
@@ -10,10 +9,10 @@ import {
   Tooltip,
   SnackbarContent
 } from "@material-ui/core";
-import ExportArrow from "@material-ui/icons/ArrowDropDownCircle";
 import { Info } from "@material-ui/icons";
 import { format } from "date-fns";
 import XlsExport from "xlsexport";
+import Icon from "./Icon";
 
 export default class StatsTable extends PureComponent {
   state = {
@@ -87,21 +86,18 @@ export default class StatsTable extends PureComponent {
 
     let report = null;
     const exportVar = (
-      <Button style={{ marginLeft: "auto" }} onClick={this.exportData}>
-        EXPORT <ExportArrow style={{ marginLeft: 15 }} />
-      </Button>
+      <button
+        className="btn-icon"
+        style={{ alignSelf: "flex-end" }}
+        onClick={this.exportData}
+      >
+        Download Data <Icon name="download" style={{ marginLeft: 10 }} />
+      </button>
     );
     if (this.props.report === "schedule_report") {
       report = (
         <Fragment>
-          <h1>Schedule report</h1>
-          <div className="flex export-wrapper">
-            <p>
-              This report shows each individual event with Wexer Count data if
-              it is available.
-            </p>
-            {exportVar}
-          </div>
+          {exportVar}
           <div className="table-wrapper">
             <Table>
               <TableHead>
@@ -153,20 +149,16 @@ export default class StatsTable extends PureComponent {
     } else if (this.props.report === "class_report") {
       report = (
         <Fragment>
-          <h1>Class title report </h1>
-          <div className="flex export-wrapper">
-            <p>
-              This report shows the total number of views for each title within
-              the selected timeframe.
-            </p>
-            {exportVar}
-          </div>
+          {exportVar}
           <div className="table-wrapper">
             <Table>
               <TableHead>
                 <TableRow>
                   {class_report_attr.map(attr => (
-                    <TableCell onClick={() => this.orderBy(attr.value)} key={`h2_${attr.value}`}>
+                    <TableCell
+                      onClick={() => this.orderBy(attr.value)}
+                      key={`h2_${attr.value}`}
+                    >
                       <TableSortLabel
                         active={orderBy === attr.value}
                         direction={orderDirection}
@@ -191,7 +183,9 @@ export default class StatsTable extends PureComponent {
                 {this.props.data.map((dataEntry, index) => (
                   <TableRow hover key={`${index}_${dataEntry.indslagid}`}>
                     {class_report_attr.map(attr => (
-                      <TableCell key={`${attr.value}`}>{dataEntry[attr.value]}</TableCell>
+                      <TableCell key={`${attr.value}`}>
+                        {dataEntry[attr.value]}
+                      </TableCell>
                     ))}
                   </TableRow>
                 ))}
@@ -204,6 +198,6 @@ export default class StatsTable extends PureComponent {
         </Fragment>
       );
     }
-    return <div className="full-width">{report}</div>;
+    return <div className="table-container">{report}</div>;
   }
 }
