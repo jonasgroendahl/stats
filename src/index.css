@@ -85,6 +85,7 @@
 .stats-container-row > span {
   margin-right: 20px;
   color: var(--gray);
+  width: 100px;
 }
 
 .stats-container-row div svg {
@@ -154,7 +155,6 @@ body {
   transition: all 0.2s ease-in;
   font-family: Montserrat;
   font-size: 14px;
-  min-width: 140px;
   text-align: center;
 }
 
@@ -233,6 +233,23 @@ body {
   display: flex;
   flex-direction: column;
   margin-top: 20px;
+}
+
+.center {
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-nav button:not(:last-child) {
+  border-right: solid var(--wteal) 2px;
+}
+
+.bottom-nav span {
+  font-size: 14px;
+}
+
+.bottom-nav .MuiBottomNavigationAction-selected-215 {
+  color: var(--wteal);
 }
 
 @media (max-width: 1000px) {

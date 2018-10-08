@@ -13,9 +13,12 @@ import {
   Card,
   CardContent,
   CardActions,
-  Divider
+  Divider,
+  BottomNavigation,
+  BottomNavigationAction
 } from "@material-ui/core";
 import { ChevronRight, ChevronLeft } from "@material-ui/icons";
+import Icon from "./components/Icon";
 import api from "./config/api";
 import WebAPI from "./js/api";
 import { subDays, format, addDays, differenceInDays } from "date-fns";
@@ -56,7 +59,8 @@ class App extends Component {
     players: [],
     desc: false,
     isCountEnabled: false,
-    isChain: 0
+    isChain: 0,
+    eventType: 0 // 0 = ALL, SCHEDULED = 1, LIVE = 2, ON DEMAND = #
   };
 
   async componentDidMount() {
@@ -320,7 +324,8 @@ class App extends Component {
       playerId,
       custom_end_date,
       custom_start_date,
-      isCountEnabled
+      isCountEnabled,
+      eventType
     } = this.state;
 
     const navElement = ({ month, onPreviousClick, onNextClick }) => (
@@ -516,6 +521,40 @@ class App extends Component {
                 </RadioGroup>
               </div>
             </div>
+          </Fragment>
+        )}
+        {report === "calendar_report" && (
+          <Fragment>
+            <Divider />
+            <div className="stats-container-row">
+              <span>Event type</span>
+              <div className="flex center">
+                <BottomNavigation
+                  showLabels
+                  className="bottom-nav"
+                  value={eventType}
+                  onChange={(_, value) =>
+                    console.log(value) || this.setState({ eventType: value })
+                  }
+                >
+                  <BottomNavigationAction label="All" />
+                  <BottomNavigationAction label="Scheduled" />
+                  <BottomNavigationAction label="Live" />
+                  <BottomNavigationAction label="On Demand" />
+                </BottomNavigation>
+              </div>
+            </div>
+            <Divider />
+            <div className="stats-container-row">
+              <span>Week:</span>
+              <div>{`${format(start_date, "MMM DD")} - ${format(
+                end_date,
+                "MMM DD"
+              )}, 2018`}</div>
+            </div>
+            <button className="btn" style={{ alignSelf: "flex-end" }}>
+              Update report
+            </button>
           </Fragment>
         )}
         {report !== "calendar_report" && (

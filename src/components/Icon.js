@@ -20,10 +20,30 @@ export default class Icon extends PureComponent {
           </svg>
         );
         break;
+      case "pipe":
+        div = (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="2"
+            height="22"
+            viewBox="0 0 2 22"
+            style={{ cursor: "default" }}
+          >
+            <path
+              fill="none"
+              fillRule="evenodd"
+              stroke="#50E3C2"
+              strokeLinecap="square"
+              d="M1 1v20"
+            />
+          </svg>
+        );
+        break;
       default:
         div = null;
         break;
     }
+
     return (
       <div
         onClick={this.props.onClick}
