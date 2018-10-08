@@ -547,10 +547,16 @@ class App extends Component {
             <Divider />
             <div className="stats-container-row">
               <span>Week:</span>
-              <div>{`${format(start_date, "MMM DD")} - ${format(
-                end_date,
-                "MMM DD"
-              )}, 2018`}</div>
+              <div className="flex center">
+                <span style={{ marginRight: 20 }}>
+                  {`${format(start_date, "MMM DD")} - ${format(
+                    end_date,
+                    "MMM DD"
+                  )}, 2018`}
+                </span>
+                <ChevronLeft style={{ marginRight: 5 }} />
+                <ChevronRight />
+              </div>
             </div>
             <button className="btn" style={{ alignSelf: "flex-end" }}>
               Update report

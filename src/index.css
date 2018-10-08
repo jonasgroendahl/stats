@@ -218,6 +218,7 @@ body {
 
 .calendar-color-box {
   margin-bottom: 10px;
+  margin-top: 20px;
 }
 
 .calendar-color-box > * {
@@ -227,6 +228,7 @@ body {
   padding: 2px;
   border-radius: 5px;
   margin: 0 2px;
+  cursor: default;
 }
 
 .table-container {
