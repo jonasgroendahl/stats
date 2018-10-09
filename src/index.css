@@ -73,6 +73,15 @@
   font-weight: bold;
 }
 
+.DayPicker-Day.DayPicker-Day--selected {
+  background-color: var(--wteal) !important;
+}
+
+.DayPicker-Day.DayPicker-Day--selected:focus,
+.DayPicker-Day:active {
+  outline: none;
+}
+
 .stats-container-row {
   display: flex;
   align-items: center;
@@ -158,6 +167,19 @@ body {
   text-align: center;
 }
 
+.select > div > div {
+  min-width: 150px;
+  font-family: "Open Sans";
+}
+
+input {
+  font-family: "Open Sans";
+}
+
+.btn-flat:hover {
+  color: var(--wteal-hover);
+}
+
 .btn {
   background-color: var(--wteal);
   color: white;
@@ -181,6 +203,7 @@ body {
   font-size: 14px;
   text-align: center;
   display: flex;
+  padding: 10px 30px;
 }
 
 .btn:hover {
@@ -189,6 +212,10 @@ body {
 
 .btn-icon:hover svg g {
   fill: var(--wteal-hover);
+}
+
+.btn-icon:hover {
+  background: #eee;
 }
 
 .low {
@@ -246,6 +273,10 @@ body {
   border-right: solid var(--wteal) 2px;
 }
 
+.bottom-nav button {
+  flex: unset;
+}
+
 .bottom-nav span {
   font-size: 14px;
   font-family: "Open Sans";
@@ -253,6 +284,30 @@ body {
 
 .bottom-nav .selected span {
   color: var(--wteal);
+}
+
+.bottom-nav button {
+  min-width: 120px;
+}
+
+.table-wrapper th {
+  padding-bottom: 1.5px;
+  background: var(--gradient) left bottom transparent no-repeat;
+  background-size: 100% 1.5px;
+  border: none;
+  font-family: Montserrat;
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--black);
+}
+
+.table-wrapper td {
+  padding-bottom: 1.5px;
+  background: var(--gradient) left bottom transparent no-repeat;
+  background-size: 100% 1.5px;
+  border: none;
+  font-family: "Open Sans";
+  font-size: 14px;
 }
 
 @media (max-width: 1000px) {

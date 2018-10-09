@@ -4,9 +4,6 @@ import StatsTable from "./components/StatsTable";
 import Calendar from "./components/Calendar";
 import LoadingModal from "./components/LoadingModal";
 import {
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   Select,
   MenuItem,
   Popper,
@@ -15,15 +12,21 @@ import {
   CardActions,
   Divider,
   BottomNavigation,
-  BottomNavigationAction
+  BottomNavigationAction,
+  withStyles
 } from "@material-ui/core";
 import { ChevronRight, ChevronLeft } from "@material-ui/icons";
-import Icon from "./components/Icon";
 import api from "./config/api";
 import WebAPI from "./js/api";
 import { subDays, format, addDays, differenceInDays } from "date-fns";
 import Datepicker from "react-day-picker";
 import "react-day-picker/lib/style.css";
+
+const styles = {
+  selected: {
+    color: "var(--wteal)"
+  }
+};
 
 class App extends Component {
   state = {
@@ -44,7 +47,7 @@ class App extends Component {
     report: "class_report",
     interval: "1 week",
     type: "all",
-    show: "0",
+    show: 0,
     customDateEl: null,
     start_date: format(subDays(new Date(), 7), "YYYY-MM-DD"),
     end_date: format(new Date(), "YYYY-MM-DD"),
@@ -258,11 +261,11 @@ class App extends Component {
     });
   };
 
-  handleDateChange = event => {
-    console.log("handleDateChange", event.target.value);
+  handleDateChange = (event, value) => {
+    console.log("handleDateChange", event, value);
     const end = format(new Date(), "YYYY-MM-DD");
     let start;
-    switch (event.target.value) {
+    switch (value) {
       case "1 week":
         start = format(subDays(new Date(), 7), "YYYY-MM-DD");
         break;
@@ -276,14 +279,16 @@ class App extends Component {
         start = format(subDays(new Date(), 7), "YYYY-MM-DD");
         break;
     }
-    console.log(event.target.value !== "custom");
+    console.log(value !== "custom");
     this.setState({
       start_date: start,
       end_date: end,
-      interval: event.target.value
+      interval: value
     });
-    if (event.target.value !== "custom") {
+    if (value !== "custom") {
       this.setState({ customDateEl: null });
+    } else {
+      this.toggleDatepicker(event);
     }
   };
 
@@ -311,6 +316,10 @@ class App extends Component {
     }
   };
 
+  handleSettingChange = (name, value) => {
+    this.setState({ [name]: value });
+  };
+
   render() {
     const {
       data,
@@ -327,6 +336,9 @@ class App extends Component {
       isCountEnabled,
       eventType
     } = this.state;
+
+    const { classes } = this.props;
+    console.log(classes);
 
     const navElement = ({ month, onPreviousClick, onNextClick }) => (
       <div className="DayPicker-Custom-Nav">
@@ -360,6 +372,14 @@ class App extends Component {
         break;
     }
 
+    const customLabel =
+      customDateEl || (custom_start_date !== "" && custom_end_date !== "")
+        ? `${format(custom_start_date, "YYYY-MM-DD")} - ${format(
+            custom_end_date,
+            "YYYY-MM-DD"
+          )}`
+        : "Custom";
+
     return (
       <div className="stats-container">
         {/*<p>Gym name: {this.state.gymName}</p>
@@ -377,6 +397,7 @@ class App extends Component {
             onChange={this.handleReportChange}
             name="report"
             disableUnderline
+            className="select"
           >
             <MenuItem value="class_report">Class title report</MenuItem>
             <MenuItem value="schedule_report">Schedule report</MenuItem>
@@ -394,6 +415,7 @@ class App extends Component {
             onChange={this.handlePlayerChange}
             value={playerId}
             disableUnderline
+            className="select"
           >
             {report !== "calendar_report" && <MenuItem value={0}>All</MenuItem>}
             {report !== "calendar_report"
@@ -418,43 +440,30 @@ class App extends Component {
           <Fragment>
             <Divider />
             <div className="stats-container-row">
-              <span>Select Date Range</span>
+              <span>Date Range</span>
               <div>
-                <RadioGroup
-                  className="row"
+                <BottomNavigation
+                  showLabels
+                  className="bottom-nav"
                   onChange={this.handleDateChange}
-                  name="interval"
                   value={interval}
                 >
-                  <FormControlLabel
+                  <BottomNavigationAction
+                    classes={classes}
                     value="1 week"
-                    control={<Radio />}
                     label="Last 7 days"
                   />
-                  <FormControlLabel
+                  <BottomNavigationAction
+                    classes={classes}
                     value="3 weeks"
-                    control={<Radio />}
                     label="Last 30 days"
                   />
-                  <FormControlLabel
-                    value="3 months"
-                    control={<Radio />}
-                    label="Last 90 days"
-                  />
-                  <FormControlLabel
-                    control={<Radio onClick={this.toggleDatepicker} />}
-                    label={
-                      customDateEl ||
-                      (custom_start_date !== "" && custom_end_date !== "")
-                        ? `${format(
-                            custom_start_date,
-                            "YYYY-MM-DD"
-                          )} - ${format(custom_end_date, "YYYY-MM-DD")}`
-                        : "Custom"
-                    }
+                  <BottomNavigationAction
                     value="custom"
+                    label={customLabel}
+                    classes={classes}
                   />
-                </RadioGroup>
+                </BottomNavigation>
               </div>
             </div>
           </Fragment>
@@ -465,33 +474,36 @@ class App extends Component {
             <div className="stats-container-row">
               <span>Type</span>
               <div>
-                <RadioGroup
-                  className="row"
-                  onChange={this.handleChange}
-                  name="type"
+                <BottomNavigation
+                  className="bottom-nav"
                   value={type}
+                  onChange={(_, value) =>
+                    this.handleSettingChange("type", value)
+                  }
+                  showLabels
                 >
-                  <FormControlLabel
+                  <BottomNavigationAction
                     value="all"
-                    control={<Radio />}
                     label="All"
+                    name="type"
+                    classes={classes}
                   />
-                  <FormControlLabel
+                  <BottomNavigationAction
                     value="scheduled"
-                    control={<Radio />}
                     label="Scheduled"
+                    classes={classes}
                   />
-                  <FormControlLabel
+                  <BottomNavigationAction
                     value="live"
-                    control={<Radio />}
                     label="Live"
+                    classes={classes}
                   />
-                  <FormControlLabel
+                  <BottomNavigationAction
                     value="ondemand"
-                    control={<Radio />}
                     label="On Demand"
+                    classes={classes}
                   />
-                </RadioGroup>
+                </BottomNavigation>
               </div>
             </div>
           </Fragment>
@@ -502,23 +514,20 @@ class App extends Component {
             <div className="stats-container-row">
               <span>Show</span>
               <div>
-                <RadioGroup
-                  className="row"
-                  onChange={this.handleChange}
-                  name="show"
+                <BottomNavigation
+                  onChange={(_, value) =>
+                    this.handleSettingChange("show", value)
+                  }
+                  className="bottom-nav"
+                  showLabels
                   value={show}
                 >
-                  <FormControlLabel
-                    value={"0"}
-                    control={<Radio />}
-                    label="All"
-                  />
-                  <FormControlLabel
-                    value={"1"}
-                    control={<Radio />}
+                  <BottomNavigationAction label="All" classes={classes} />
+                  <BottomNavigationAction
                     label="Only Count enabled"
+                    classes={classes}
                   />
-                </RadioGroup>
+                </BottomNavigation>
               </div>
             </div>
           </Fragment>
@@ -537,22 +546,10 @@ class App extends Component {
                     console.log(value) || this.setState({ eventType: value })
                   }
                 >
-                  <BottomNavigationAction
-                    label="All"
-                    className={eventType === 0 && "selected"}
-                  />
-                  <BottomNavigationAction
-                    label="Scheduled"
-                    className={eventType === 1 && "selected"}
-                  />
-                  <BottomNavigationAction
-                    label="Live"
-                    className={eventType === 2 && "selected"}
-                  />
-                  <BottomNavigationAction
-                    label="On Demand"
-                    className={eventType === 3 && "selected"}
-                  />
+                  <BottomNavigationAction label="All" />
+                  <BottomNavigationAction label="Scheduled" />
+                  <BottomNavigationAction label="Live" />
+                  <BottomNavigationAction label="On Demand" />
                 </BottomNavigation>
               </div>
             </div>
@@ -596,7 +593,7 @@ class App extends Component {
           <Calendar data={data} setInterval={this.setInterval} />
         )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
-          <Card>
+          <Card raised>
             <CardContent className="flex" id="test">
               <div style={{ marginRight: 25 }}>
                 <Datepicker
@@ -647,4 +644,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withStyles(styles)(App);

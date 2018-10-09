@@ -7,7 +7,9 @@ import {
   TableRow,
   TableSortLabel,
   Tooltip,
-  SnackbarContent
+  SnackbarContent,
+  TableFooter,
+  TablePagination
 } from "@material-ui/core";
 import { Info } from "@material-ui/icons";
 import { format } from "date-fns";
@@ -33,7 +35,9 @@ export default class StatsTable extends PureComponent {
       { value: "datostempel", text: "Start" },
       { value: "count", text: "Head count" },
       { value: "type", text: "Type" }
-    ]
+    ],
+    rowsPerPage: 10,
+    page: 0
   };
 
   exportData = () => {
@@ -81,7 +85,9 @@ export default class StatsTable extends PureComponent {
       orderBy,
       orderDirection,
       class_report_attr,
-      schedule_report_attr
+      schedule_report_attr,
+      page,
+      rowsPerPage
     } = this.state;
 
     let report = null;
@@ -119,26 +125,46 @@ export default class StatsTable extends PureComponent {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.props.data.map((dataEntry, index) => (
-                  <TableRow hover key={index}>
-                    <TableCell>{dataEntry.video_title_long}</TableCell>
-                    <TableCell>
-                      {format(new Date(dataEntry.datostempel), "dddd Do MMMM")}
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(dataEntry.datostempel), "HH:mm")}
-                    </TableCell>
-                    <TableCell numeric>{dataEntry.count}</TableCell>
-                    <TableCell>
-                      {dataEntry.video_typeid === 100
-                        ? "Live"
-                        : dataEntry.ondemand_selections
-                          ? "On-Demand"
-                          : "Scheduled"}
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {this.props.data
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((dataEntry, index) => (
+                    <TableRow hover key={index}>
+                      <TableCell>{dataEntry.video_title_long}</TableCell>
+                      <TableCell>
+                        {format(
+                          new Date(dataEntry.datostempel),
+                          "dddd Do MMMM"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {format(new Date(dataEntry.datostempel), "HH:mm")}
+                      </TableCell>
+                      <TableCell numeric>{dataEntry.count}</TableCell>
+                      <TableCell>
+                        {dataEntry.video_typeid === 100
+                          ? "Live"
+                          : dataEntry.ondemand_selections
+                            ? "On-Demand"
+                            : "Scheduled"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
               </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    count={this.props.data.length}
+                    onChangePage={(_, page) => this.setState({ page })}
+                    rowsPerPageOptions={[5]}
+                    onChangeRowsPerPage={(_, value) =>
+                      this.setState({ rowsPerPage: value })
+                    }
+                    className="pagination"
+                  />
+                </TableRow>
+              </TableFooter>
             </Table>
             {this.props.data.length === 0 && (
               <SnackbarContent className="label" message="No results" />
@@ -180,16 +206,34 @@ export default class StatsTable extends PureComponent {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.props.data.map((dataEntry, index) => (
-                  <TableRow hover key={`${index}_${dataEntry.indslagid}`}>
-                    {class_report_attr.map(attr => (
-                      <TableCell key={`${attr.value}`}>
-                        {dataEntry[attr.value]}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))}
+                {this.props.data
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((dataEntry, index) => (
+                    <TableRow hover key={`${index}_${dataEntry.indslagid}`}>
+                      {class_report_attr.map(attr => (
+                        <TableCell key={`${attr.value}`}>
+                          {dataEntry[attr.value]}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                <div />
               </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    count={this.props.data.length}
+                    onChangePage={(_, page) => this.setState({ page })}
+                    rowsPerPageOptions={[5]}
+                    onChangeRowsPerPage={(_, value) =>
+                      this.setState({ rowsPerPage: value })
+                    }
+                    className="pagination"
+                  />
+                </TableRow>
+              </TableFooter>
             </Table>
             {this.props.data.length === 0 && (
               <SnackbarContent className="label" message="No results" />
