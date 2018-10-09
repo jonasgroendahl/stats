@@ -13,12 +13,19 @@ import {
   Divider,
   BottomNavigation,
   BottomNavigationAction,
-  withStyles
+  withStyles,
+  IconButton
 } from "@material-ui/core";
 import { ChevronRight, ChevronLeft } from "@material-ui/icons";
 import api from "./config/api";
 import WebAPI from "./js/api";
-import { subDays, format, addDays, differenceInDays } from "date-fns";
+import {
+  subDays,
+  format,
+  addDays,
+  differenceInDays,
+  startOfWeek
+} from "date-fns";
 import Datepicker from "react-day-picker";
 import "react-day-picker/lib/style.css";
 
@@ -51,7 +58,7 @@ class App extends Component {
     customDateEl: null,
     start_date: format(subDays(new Date(), 7), "YYYY-MM-DD"),
     end_date: format(new Date(), "YYYY-MM-DD"),
-    gymId: 124, // 1060 Pure Gym
+    gymId: 1060, // 1060 Pure Gym   124 GoodLife
     gymName: "",
     sensors: [],
     token: 0,
@@ -69,7 +76,7 @@ class App extends Component {
   async componentDidMount() {
     if (window.location.search) {
       const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get("gym_id") ? urlParams.get("gym_id") : 124;
+      const id = urlParams.get("gym_id") ? urlParams.get("gym_id") : 1060;
       const isChain = urlParams.get("chain") ? 1 : 0;
       await this.setState({ gymId: id, isChain });
     }
@@ -146,11 +153,11 @@ class App extends Component {
 
     let dataResponse;
 
-    const start =
+    let start =
       interval !== "custom"
         ? start_date
         : format(custom_start_date, "YYYY-MM-DD");
-    const end =
+    let end =
       interval !== "custom" ? end_date : format(custom_end_date, "YYYY-MM-DD");
 
     if (report === "schedule_report") {
@@ -180,7 +187,15 @@ class App extends Component {
         const player = players.find(pl => pl.zone_id !== 0);
         console.log("Found a player", player);
         await this.setState({ playerId: player.identitetid });
+        start = format(
+          startOfWeek(new Date(), { weekStartsOn: 1 }),
+          "YYYY-MM-DD"
+        );
+        end = format(addDays(start, 6), "YYYY-MM-DD");
+        this.setState({ start_date: start, end_date: end });
       }
+      console.log("start bruv", start);
+      console.log("end bruv", end);
       dataResponse = await WebAPI.getScheduleReportData(
         token,
         gymId,
@@ -228,7 +243,7 @@ class App extends Component {
   setInterval = (start, end) => {
     this.setState(
       { custom_start_date: start, custom_end_date: end, interval: "custom" },
-      () => this.getData(false)
+      () => this.getData(true)
     );
   };
 
@@ -318,6 +333,32 @@ class App extends Component {
 
   handleSettingChange = (name, value) => {
     this.setState({ [name]: value });
+  };
+
+  incrementWeek = async () => {
+    const start_date = format(
+      addDays(new Date(this.state.start_date), 7),
+      "YYYY-MM-DD"
+    );
+    const end_date = format(
+      addDays(new Date(this.state.end_date), 7),
+      "YYYY-MM-DD"
+    );
+    await this.setState({ start_date, end_date });
+    this.getData(true);
+  };
+
+  decrementWeek = async () => {
+    const start_date = format(
+      subDays(new Date(this.state.start_date), 7),
+      "YYYY-MM-DD"
+    );
+    const end_date = format(
+      subDays(new Date(this.state.end_date), 7),
+      "YYYY-MM-DD"
+    );
+    await this.setState({ start_date, end_date });
+    this.getData(true);
   };
 
   render() {
@@ -563,8 +604,15 @@ class App extends Component {
                     "MMM DD"
                   )}, 2018`}
                 </span>
-                <ChevronLeft style={{ marginRight: 5 }} />
-                <ChevronRight />
+                <IconButton
+                  style={{ marginRight: 5 }}
+                  onClick={this.decrementWeek}
+                >
+                  <ChevronLeft />
+                </IconButton>
+                <IconButton onClick={this.incrementWeek}>
+                  <ChevronRight />
+                </IconButton>
               </div>
             </div>
             <button className="btn" style={{ alignSelf: "flex-end" }}>
@@ -590,7 +638,11 @@ class App extends Component {
             show={show}
           />
         ) : (
-          <Calendar data={data} setInterval={this.setInterval} />
+          <Calendar
+            data={data}
+            setInterval={this.setInterval}
+            start_date={start_date}
+          />
         )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card raised>

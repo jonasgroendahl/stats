@@ -7,7 +7,7 @@ export default class LoadingModal extends PureComponent {
       <Dialog open={this.props.open}>
         <DialogContent className="loading-modal-body">
           <p>Fetching data...</p>
-          <CircularProgress />
+          <CircularProgress style={{ color: "var(--wteal)" }} />
         </DialogContent>
       </Dialog>
     );

@@ -82,6 +82,10 @@
   outline: none;
 }
 
+div.DayPicker-Day--today {
+  color: var(--wteal-hover);
+}
+
 .stats-container-row {
   display: flex;
   align-items: center;
@@ -168,7 +172,7 @@ body {
 }
 
 .select > div > div {
-  min-width: 150px;
+  min-width: 250px;
   font-family: "Open Sans";
 }
 
@@ -220,22 +224,27 @@ input {
 
 .low {
   background-color: #8bf1da !important;
+  border: #8bf1da !important;
 }
 
 .med {
   background-color: #64d8b6 !important;
+  border: #64d8b6 !important;
 }
 
 .med-high {
   background-color: #4ead91 !important;
+  border: #4ead91 !important;
 }
 
 .high {
   background-color: #377a66 !important;
+  border: #377a66 !important;
 }
 
 .v-high {
   background-color: #1d4137 !important;
+  border: #1d4137 !important;
 }
 
 .calendar-color-box {
@@ -275,6 +284,7 @@ input {
 
 .bottom-nav button {
   flex: unset;
+  max-width: unset;
 }
 
 .bottom-nav span {
@@ -299,6 +309,16 @@ input {
   font-size: 18px;
   font-weight: 900;
   color: var(--black);
+}
+
+/* To line up header and first column of the table */
+
+.table-wrapper th:first-child {
+  padding-left: 0;
+}
+
+.table-wrapper td:first-child {
+  padding-left: 0;
 }
 
 .table-wrapper td {

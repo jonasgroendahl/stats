@@ -10,8 +10,12 @@ export default class CalendarComponent extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.data.length !== this.props.data.length) {
-      console.log("New events!");
+    if (
+      prevProps.data.length !== this.props.data.length ||
+      prevProps.start_date !== this.props.start_date
+    ) {
+      console.log("New events!", this.props.start_date);
+      this.calendar.gotoDate(this.props.start_date);
       this.calendar.refetchEvents();
     }
   }
@@ -27,6 +31,7 @@ export default class CalendarComponent extends PureComponent {
       minTime: "06:00:00",
       maxTime: "24:00:00",
       header: false,
+      firstDay: 1,
       eventRender: (event, element) => {
         const span = document.createElement("span");
         span.style.float = "right";
