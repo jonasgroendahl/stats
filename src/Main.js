@@ -587,10 +587,10 @@ class App extends Component {
                     console.log(value) || this.setState({ eventType: value })
                   }
                 >
-                  <BottomNavigationAction label="All" />
-                  <BottomNavigationAction label="Scheduled" />
-                  <BottomNavigationAction label="Live" />
-                  <BottomNavigationAction label="On Demand" />
+                  <BottomNavigationAction classes={classes} label="All" />
+                  <BottomNavigationAction classes={classes} label="Scheduled" />
+                  <BottomNavigationAction classes={classes} label="Live" />
+                  <BottomNavigationAction classes={classes} label="On Demand" />
                 </BottomNavigation>
               </div>
             </div>
@@ -615,20 +615,15 @@ class App extends Component {
                 </IconButton>
               </div>
             </div>
-            <button className="btn" style={{ alignSelf: "flex-end" }}>
-              Update report
-            </button>
           </Fragment>
         )}
-        {report !== "calendar_report" && (
-          <button
-            className="btn"
-            onClick={this.getData}
-            style={{ alignSelf: "flex-end" }}
-          >
-            Generate report
-          </button>
-        )}
+        <button
+          className="btn"
+          onClick={this.getData}
+          style={{ alignSelf: "flex-end" }}
+        >
+          Update report
+        </button>
         {report !== "calendar_report" ? (
           <StatsTable
             data={data}

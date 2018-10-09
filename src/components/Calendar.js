@@ -3,6 +3,12 @@ import { Calendar } from "fullcalendar";
 import "../../node_modules/fullcalendar/dist/fullcalendar.min.css";
 import { format, addSeconds } from "date-fns";
 
+const styles = {
+  selected: {
+    color: "var(--wteal)"
+  }
+};
+
 export default class CalendarComponent extends PureComponent {
   componentDidMount() {
     this.createCalendar();
