@@ -373,7 +373,7 @@ input {
   text-align: center;
 }
 
-.calendar-wrapper table tbody.fc-body > tr:nth-child(4n) td {
+.calendar-wrapper table tbody.fc-body tr:nth-child(4n) td {
   border-bottom: solid #eee 1px;
 }
 
