@@ -38,6 +38,9 @@ export default class CalendarComponent extends PureComponent {
       maxTime: "24:00:00",
       header: false,
       firstDay: 1,
+      slotLabelInterval: "01:00:00",
+      slotLabelFormat: "HH:mm",
+      columnFormat: "ddd",
       eventRender: (event, element) => {
         const span = document.createElement("span");
         span.style.float = "right";
@@ -100,8 +103,8 @@ export default class CalendarComponent extends PureComponent {
       <div className="calendar-wrapper">
         <div className="calendar-color-box">
           <span className="text--gray">Key:</span>
-          <div className="low">0-5</div>
-          <div className="med">6-10</div>
+          <div className="low text--black">0-5</div>
+          <div className="med text--black">6-10</div>
           <div className="med-high">11-15</div>
           <div className="high">16-20</div>
           <div className="v-high">20+</div>

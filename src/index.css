@@ -3,7 +3,7 @@
   --wteal-hover: #4ead91;
   --svg-gray: #727271;
   --gray: #9b9b9b;
-  --gray-d: #9d9d9d;
+  --gray-light: #d8d8d8;
   --gradient: linear-gradient(90deg, rgb(0, 223, 179), rgb(34, 198, 252));
   --black: #3c3c3b;
 }
@@ -20,6 +20,7 @@
 #calendar .fc-event {
   background-color: rgb(47, 47, 47);
   border: none;
+  text-align: start;
 }
 
 #calendar .fc-event .fc-bg {
@@ -80,6 +81,12 @@
 .DayPicker-Day.DayPicker-Day--selected:focus,
 .DayPicker-Day:active {
   outline: none;
+}
+
+div.DayPicker-Day {
+  background-color: var(--gray-light);
+  border-radius: 0;
+  border: solid 2px white;
 }
 
 div.DayPicker-Day--today {
@@ -219,7 +226,13 @@ input {
 }
 
 .btn-icon:hover {
-  background: #eee;
+  background: var(--gray-light);
+}
+
+.btn:active,
+.btn-icon:active,
+.btn-flat:active {
+  outline: none;
 }
 
 .low {
@@ -322,12 +335,50 @@ input {
 }
 
 .table-wrapper td {
-  padding-bottom: 1.5px;
-  background: var(--gradient) left bottom transparent no-repeat;
-  background-size: 100% 1.5px;
   border: none;
   font-family: "Open Sans";
   font-size: 14px;
+}
+
+.table-wrapper tr:not(:last-child) td {
+  padding-bottom: 1.5px;
+  background: var(--gradient) left bottom transparent no-repeat;
+  background-size: 100% 1.5px;
+}
+
+/* Calendar CSS */
+
+.fc-today {
+  background-color: #8bf1da8f !important;
+}
+
+.calendar-wrapper thead th {
+  font-family: Montserrat;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--black);
+  font-size: 18px;
+}
+
+.calendar-wrapper thead tr td.fc-head-container {
+  border-bottom: 3px solid rgb(0, 223, 179);
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+}
+
+.calendar-wrapper table tbody.fc-body td:first-child {
+  border: 0;
+  width: 50px !important;
+  text-align: center;
+}
+
+.calendar-wrapper table tbody.fc-body > tr:nth-child(4n) td {
+  border-bottom: solid #eee 1px;
+}
+
+.calendar-wrapper table table > thead > tr > th.fc-axis.fc-widget-header {
+  width: 50px !important;
 }
 
 @media (max-width: 1000px) {
