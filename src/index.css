@@ -14,7 +14,7 @@
 
 .calendar-wrapper {
   margin-top: 10px;
-  height: calc(100vh - 170px);
+  height: calc(100vh - 500px);
 }
 
 #calendar .fc-event {
@@ -178,11 +178,6 @@ body {
   text-align: center;
 }
 
-.select > div > div {
-  min-width: 250px;
-  font-family: "Open Sans";
-}
-
 input {
   font-family: "Open Sans";
 }
@@ -202,6 +197,7 @@ input {
   font-size: 14px;
   min-width: 140px;
   text-align: center;
+  font-weight: 900;
 }
 
 .btn-icon {
@@ -210,11 +206,11 @@ input {
   border: 0;
   cursor: pointer;
   transition: all 0.2s ease-in;
-  font-family: Montserrat;
+  font-family: "Open Sans";
   font-size: 14px;
   text-align: center;
   display: flex;
-  padding: 10px 30px;
+  padding: 10px;
 }
 
 .btn:hover {
@@ -283,7 +279,7 @@ input {
 .table-container {
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .center {
@@ -300,9 +296,17 @@ input {
   max-width: unset;
 }
 
-.bottom-nav span {
+.bottom-nav span > span {
   font-size: 14px;
-  font-family: "Open Sans";
+  font-family: Montserrat;
+  font-weight: 900;
+}
+
+.select > div > div {
+  min-width: 250px;
+  font-family: Montserrat;
+  font-weight: 900;
+  color: var(--black);
 }
 
 .bottom-nav .selected span {
@@ -311,6 +315,13 @@ input {
 
 .bottom-nav button {
   min-width: 120px;
+}
+
+.week-label{
+  margin-right: 20px;
+  font-family: Montserrat;
+  font-weight: 900;
+  color: var(--black);
 }
 
 .table-wrapper th {

@@ -31,7 +31,10 @@ import "react-day-picker/lib/style.css";
 
 const styles = {
   selected: {
-    color: "var(--wteal)"
+    color: "var(--wteal)!important"
+  },
+  label: {
+    color: "var(--black)"
   }
 };
 
@@ -160,65 +163,71 @@ class App extends Component {
     let end =
       interval !== "custom" ? end_date : format(custom_end_date, "YYYY-MM-DD");
 
-    if (report === "schedule_report") {
-      dataResponse = await WebAPI.getScheduleReportData(
-        token,
-        gymId,
-        playerId,
-        start,
-        end,
-        type,
-        show,
-        isChain
-      );
-    } else if (report === "class_report") {
-      dataResponse = await WebAPI.getClassReportData(
-        token,
-        gymId,
-        playerId,
-        start,
-        end,
-        type,
-        show,
-        isChain
-      );
-    } else if (report === "calendar_report") {
-      if (!setDefault) {
-        const player = players.find(pl => pl.zone_id !== 0);
-        console.log("Found a player", player);
-        await this.setState({ playerId: player.identitetid });
-        start = format(
-          startOfWeek(new Date(), { weekStartsOn: 1 }),
-          "YYYY-MM-DD"
+    try {
+      if (report === "schedule_report") {
+        dataResponse = await WebAPI.getScheduleReportData(
+          token,
+          gymId,
+          playerId,
+          start,
+          end,
+          type,
+          show,
+          isChain
         );
-        end = format(addDays(start, 6), "YYYY-MM-DD");
-        this.setState({ start_date: start, end_date: end });
+      } else if (report === "class_report") {
+        dataResponse = await WebAPI.getClassReportData(
+          token,
+          gymId,
+          playerId,
+          start,
+          end,
+          type,
+          show,
+          isChain
+        );
+      } else if (report === "calendar_report") {
+        if (!setDefault) {
+          const player = players.find(pl => pl.zone_id !== 0);
+          console.log("Found a player", player);
+          await this.setState({ playerId: player.identitetid });
+          start = format(
+            startOfWeek(new Date(), { weekStartsOn: 1 }),
+            "YYYY-MM-DD"
+          );
+          end = format(addDays(start, 6), "YYYY-MM-DD");
+          this.setState({ start_date: start, end_date: end });
+        }
+        console.log("start bruv", start);
+        console.log("end bruv", end);
+        dataResponse = await WebAPI.getScheduleReportData(
+          token,
+          gymId,
+          this.state.playerId,
+          start,
+          end,
+          "scheduled",
+          show,
+          isChain
+        );
       }
-      console.log("start bruv", start);
-      console.log("end bruv", end);
-      dataResponse = await WebAPI.getScheduleReportData(
-        token,
-        gymId,
-        this.state.playerId,
-        start,
-        end,
-        "scheduled",
-        show,
-        isChain
-      );
+      console.log("Data retrieval", dataResponse.data);
+      const formattedData = dataResponse.data
+        .map(stat => {
+          return {
+            ...stat,
+            video_category: this.mapCategory(stat.video_category),
+            avg: (stat.count / stat.views).toFixed(2),
+            video_title_long: stat.video_title_long.replace(/[?]/g, "")
+          };
+        })
+        .sort((a, b) => (a.views > b.views ? -1 : 1));
+      this.setState({ data: formattedData, loading: false });
     }
-    console.log("Data retrieval", dataResponse.data);
-    const formattedData = dataResponse.data
-      .map(stat => {
-        return {
-          ...stat,
-          video_category: this.mapCategory(stat.video_category),
-          avg: (stat.count / stat.views).toFixed(2),
-          video_title_long: stat.video_title_long.replace(/[?]/g, "")
-        };
-      })
-      .sort((a, b) => (a.views > b.views ? -1 : 1));
-    this.setState({ data: formattedData, loading: false });
+    catch (e) {
+      alert('An error occured trying to fetch data - Contact support');
+      this.setState({ loading: false });
+    }
   };
 
   mapCategory = category => {
@@ -416,9 +425,9 @@ class App extends Component {
     const customLabel =
       customDateEl || (custom_start_date !== "" && custom_end_date !== "")
         ? `${format(custom_start_date, "YYYY-MM-DD")} - ${format(
-            custom_end_date,
-            "YYYY-MM-DD"
-          )}`
+          custom_end_date,
+          "YYYY-MM-DD"
+        )}`
         : "Custom";
 
     return (
@@ -461,20 +470,20 @@ class App extends Component {
             {report !== "calendar_report" && <MenuItem value={0}>All</MenuItem>}
             {report !== "calendar_report"
               ? this.state.players.map(player => (
-                  <MenuItem key={player.identitetid} value={player.identitetid}>
+                <MenuItem key={player.identitetid} value={player.identitetid}>
+                  {player.navn}
+                </MenuItem>
+              ))
+              : this.state.players
+                .filter(pl => pl.zone_id !== 0)
+                .map(player => (
+                  <MenuItem
+                    value={player.identitetid}
+                    key={player.identitetid}
+                  >
                     {player.navn}
                   </MenuItem>
-                ))
-              : this.state.players
-                  .filter(pl => pl.zone_id !== 0)
-                  .map(player => (
-                    <MenuItem
-                      value={player.identitetid}
-                      key={player.identitetid}
-                    >
-                      {player.navn}
-                    </MenuItem>
-                  ))}
+                ))}
           </Select>
         </div>
         {report !== "calendar_report" && (
@@ -598,7 +607,7 @@ class App extends Component {
             <div className="stats-container-row">
               <span>Week:</span>
               <div className="flex center">
-                <span style={{ marginRight: 20 }}>
+                <span className="week-label">
                   {`${format(start_date, "MMM DD")} - ${format(
                     end_date,
                     "MMM DD"
@@ -633,12 +642,12 @@ class App extends Component {
             show={show}
           />
         ) : (
-          <Calendar
-            data={data}
-            setInterval={this.setInterval}
-            start_date={start_date}
-          />
-        )}
+            <Calendar
+              data={data}
+              setInterval={this.setInterval}
+              start_date={start_date}
+            />
+          )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card raised>
             <CardContent className="flex" id="test">
