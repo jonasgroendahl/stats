@@ -61,7 +61,7 @@ class App extends Component {
     customDateEl: null,
     start_date: format(subDays(new Date(), 7), "YYYY-MM-DD"),
     end_date: format(new Date(), "YYYY-MM-DD"),
-    gymId: 1060, // 1060 Pure Gym   124 GoodLife
+    gymId: 1060, // 1060 Pure Gym   124 GoodLife  5475 REPEAT århus
     gymName: "",
     sensors: [],
     token: 0,
@@ -198,15 +198,13 @@ class App extends Component {
           end = format(addDays(start, 6), "YYYY-MM-DD");
           this.setState({ start_date: start, end_date: end });
         }
-        console.log("start bruv", start);
-        console.log("end bruv", end);
         dataResponse = await WebAPI.getScheduleReportData(
           token,
           gymId,
           this.state.playerId,
           start,
           end,
-          "scheduled",
+          type,
           show,
           isChain
         );
@@ -383,12 +381,10 @@ class App extends Component {
       playerId,
       custom_end_date,
       custom_start_date,
-      isCountEnabled,
-      eventType
+      isCountEnabled
     } = this.state;
 
     const { classes } = this.props;
-    console.log(classes);
 
     const navElement = ({ month, onPreviousClick, onNextClick }) => (
       <div className="DayPicker-Custom-Nav">
@@ -453,7 +449,7 @@ class App extends Component {
             <MenuItem value="schedule_report">Schedule report</MenuItem>
             {isCountEnabled && (
               <MenuItem value="calendar_report">
-                Wexer Count calendar report
+                Calendar count report
               </MenuItem>
             )}
           </Select>
@@ -591,15 +587,15 @@ class App extends Component {
                 <BottomNavigation
                   showLabels
                   className="bottom-nav"
-                  value={eventType}
+                  value={type}
                   onChange={(_, value) =>
-                    console.log(value) || this.setState({ eventType: value })
+                    console.log(value) || this.setState({ type: value })
                   }
                 >
-                  <BottomNavigationAction classes={classes} label="All" />
-                  <BottomNavigationAction classes={classes} label="Scheduled" />
-                  <BottomNavigationAction classes={classes} label="Live" />
-                  <BottomNavigationAction classes={classes} label="On Demand" />
+                  <BottomNavigationAction classes={classes} value="all" label="All" />
+                  <BottomNavigationAction classes={classes} value="scheduled" label="Scheduled" />
+                  <BottomNavigationAction classes={classes} value="live" label="Live" />
+                  <BottomNavigationAction classes={classes} value="ondemand" label="On Demand" />
                 </BottomNavigation>
               </div>
             </div>
