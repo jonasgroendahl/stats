@@ -307,6 +307,7 @@ input {
   font-family: Montserrat;
   font-weight: 900;
   color: var(--black);
+  padding-left: 10px;
 }
 
 .bottom-nav .selected span {
@@ -395,5 +396,55 @@ input {
 @media (max-width: 1000px) {
   .flex {
     flex-flow: wrap column;
+  }
+}
+
+
+/* Extras */
+
+.ToggleButton{
+  box-shadow: none !important;
+}
+
+.ToggleButton button span{
+  color: var(--black); 
+  font-family: Montserrat;
+  text-transform: initial;
+  font-weight: 900;
+}
+
+button.ToggleButtonSelected {
+  color: transparent;
+}
+
+.ToggleButton .ToggleButtonSelected span{
+  color: var(--wteal);
+}
+
+.ToggleButton button:not(:last-child) {
+  border-right: solid var(--wteal) 2px;
+}
+
+.text--wrap{
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@media (max-width: 700px){
+  .ToggleButton{
+    display:flex;
+    flex-flow: column wrap;
+    padding: 5px 0;
+    margin: auto;
+  }
+  .ToggleButton button:not(:last-child){
+    border-right: none;
+    border-bottom: solid var(--wteal) 2px;
+  }
+  .select > div > div {
+    min-width: unset;
+    width: 100%;
+    max-width: 153px;
   }
 }

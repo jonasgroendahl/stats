@@ -11,8 +11,6 @@ import {
   CardContent,
   CardActions,
   Divider,
-  BottomNavigation,
-  BottomNavigationAction,
   withStyles,
   IconButton
 } from "@material-ui/core";
@@ -28,6 +26,7 @@ import {
 } from "date-fns";
 import Datepicker from "react-day-picker";
 import "react-day-picker/lib/style.css";
+import { ToggleButtonGroup, ToggleButton } from "@material-ui/lab";
 
 const styles = {
   selected: {
@@ -339,8 +338,13 @@ class App extends Component {
   };
 
   handleSettingChange = (name, value) => {
+    console.log("handleSettingChange", name, value);
     this.setState({ [name]: value });
   };
+
+  handleToggleBtnChange = (name, value) => {
+    value !== null && this.setState({ [name]: value });
+  }
 
   incrementWeek = async () => {
     const start_date = format(
@@ -487,118 +491,38 @@ class App extends Component {
             <Divider />
             <div className="stats-container-row">
               <span>Date Range</span>
-              <div>
-                <BottomNavigation
-                  showLabels
-                  className="bottom-nav"
-                  onChange={this.handleDateChange}
-                  value={interval}
-                >
-                  <BottomNavigationAction
-                    classes={classes}
-                    value="1 week"
-                    label="Last 7 days"
-                  />
-                  <BottomNavigationAction
-                    classes={classes}
-                    value="3 weeks"
-                    label="Last 30 days"
-                  />
-                  <BottomNavigationAction
-                    value="custom"
-                    label={customLabel}
-                    classes={classes}
-                  />
-                </BottomNavigation>
-              </div>
+              <ToggleButtonGroup className="ToggleButton" exclusive value={interval} onChange={this.handleDateChange}>
+                <ToggleButton value="1 week" className={interval === '1 week' ? 'ToggleButtonSelected' : ''}>Last 7 days</ToggleButton>
+                <ToggleButton value="3 weeks" className={interval === '3 weeks' ? 'ToggleButtonSelected' : ''}>Last 30 days</ToggleButton>
+                <ToggleButton value="custom" className={interval === 'custom' ? 'ToggleButtonSelected' : ''}>{customLabel}</ToggleButton>
+              </ToggleButtonGroup>
             </div>
           </Fragment>
         )}
-        {report !== "calendar_report" && (
-          <Fragment>
-            <Divider />
-            <div className="stats-container-row">
-              <span>Type</span>
-              <div>
-                <BottomNavigation
-                  className="bottom-nav"
-                  value={type}
-                  onChange={(_, value) =>
-                    this.handleSettingChange("type", value)
-                  }
-                  showLabels
-                >
-                  <BottomNavigationAction
-                    value="all"
-                    label="All"
-                    name="type"
-                    classes={classes}
-                  />
-                  <BottomNavigationAction
-                    value="scheduled"
-                    label="Scheduled"
-                    classes={classes}
-                  />
-                  <BottomNavigationAction
-                    value="live"
-                    label="Live"
-                    classes={classes}
-                  />
-                  <BottomNavigationAction
-                    value="ondemand"
-                    label="On Demand"
-                    classes={classes}
-                  />
-                </BottomNavigation>
-              </div>
-            </div>
-          </Fragment>
-        )}
+        <Divider />
+        <div className="stats-container-row">
+          <span>Event Type</span>
+          <ToggleButtonGroup className="ToggleButton" exclusive value={type} onChange={(_, value) => this.handleToggleBtnChange('type', value)}>
+            <ToggleButton value="all" className={type === 'all' ? 'ToggleButtonSelected' : ''}>All</ToggleButton>
+            <ToggleButton value="scheduled" className={type === 'scheduled' ? 'ToggleButtonSelected' : ''}>Scheduled</ToggleButton>
+            <ToggleButton value="live" className={type === 'live' ? 'ToggleButtonSelected' : ''}>Live</ToggleButton>
+            <ToggleButton value="ondemand" className={type === 'ondemand' ? 'ToggleButtonSelected' : ''}>On Demand</ToggleButton>
+          </ToggleButtonGroup>
+        </div>
         {report !== "calendar_report" && (
           <Fragment>
             <Divider />
             <div className="stats-container-row">
               <span>Show</span>
-              <div>
-                <BottomNavigation
-                  onChange={(_, value) =>
-                    this.handleSettingChange("show", value)
-                  }
-                  className="bottom-nav"
-                  showLabels
-                  value={show}
-                >
-                  <BottomNavigationAction label="All" classes={classes} />
-                  <BottomNavigationAction
-                    label="Only Count enabled"
-                    classes={classes}
-                  />
-                </BottomNavigation>
-              </div>
+              <ToggleButtonGroup className="ToggleButton" exclusive value={show} onChange={(_, value) => this.handleToggleBtnChange('show', value)}>
+                <ToggleButton value={0} className={show === 0 ? 'ToggleButtonSelected' : ''}>Show</ToggleButton>
+                <ToggleButton value={1} className={show === 1 ? 'ToggleButtonSelected' : ''}>Only Count enabled</ToggleButton>
+              </ToggleButtonGroup>
             </div>
           </Fragment>
         )}
         {report === "calendar_report" && (
           <Fragment>
-            <Divider />
-            <div className="stats-container-row">
-              <span>Event type</span>
-              <div className="flex center">
-                <BottomNavigation
-                  showLabels
-                  className="bottom-nav"
-                  value={type}
-                  onChange={(_, value) =>
-                    console.log(value) || this.setState({ type: value })
-                  }
-                >
-                  <BottomNavigationAction classes={classes} value="all" label="All" />
-                  <BottomNavigationAction classes={classes} value="scheduled" label="Scheduled" />
-                  <BottomNavigationAction classes={classes} value="live" label="Live" />
-                  <BottomNavigationAction classes={classes} value="ondemand" label="On Demand" />
-                </BottomNavigation>
-              </div>
-            </div>
             <Divider />
             <div className="stats-container-row">
               <span>Week:</span>
