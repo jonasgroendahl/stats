@@ -72,13 +72,18 @@ class App extends Component {
     desc: false,
     isCountEnabled: false,
     isChain: 0,
-    eventType: 0 // 0 = ALL, SCHEDULED = 1, LIVE = 2, ON DEMAND = #
+    eventType: 0, // 0 = ALL, SCHEDULED = 1, LIVE = 2, ON DEMAND = #,
+    mode: 1
   };
 
   async componentDidMount() {
+    let mode = 1;
     if (window.location.search) {
       const urlParams = new URLSearchParams(window.location.search);
-      const id = urlParams.get("gym_id") ? urlParams.get("gym_id") : 1060;
+      const id = urlParams.get("gym_id")
+        ? urlParams.get("gym_id")
+        : this.state.gymId;
+      mode = urlParams.has("mode") ? urlParams.get("mode") : this.state.mode;
       const isChain = urlParams.get("chain") ? 1 : 0;
       await this.setState({ gymId: id, isChain });
     }
@@ -106,7 +111,8 @@ class App extends Component {
       {
         loading: false,
         sensors: resultSensors.data,
-        isCountEnabled
+        isCountEnabled,
+        mode
       },
       () => this.getData()
     );
@@ -150,7 +156,8 @@ class App extends Component {
       report,
       start_date,
       end_date,
-      isChain
+      isChain,
+      mode
     } = this.state;
 
     let dataResponse;
@@ -172,7 +179,8 @@ class App extends Component {
           end,
           type,
           show,
-          isChain
+          isChain,
+          mode
         );
       } else if (report === "class_report") {
         dataResponse = await WebAPI.getClassReportData(
@@ -183,7 +191,8 @@ class App extends Component {
           end,
           type,
           show,
-          isChain
+          isChain,
+          mode
         );
       } else if (report === "calendar_report") {
         if (!setDefault) {
@@ -205,7 +214,8 @@ class App extends Component {
           end,
           type,
           show,
-          isChain
+          isChain,
+          mode
         );
       }
       console.log("Data retrieval", dataResponse.data);
@@ -220,9 +230,8 @@ class App extends Component {
         })
         .sort((a, b) => (a.views > b.views ? -1 : 1));
       this.setState({ data: formattedData, loading: false });
-    }
-    catch (e) {
-      alert('An error occured trying to fetch data - Contact support');
+    } catch (e) {
+      alert("An error occured trying to fetch data - Contact support");
       this.setState({ loading: false });
     }
   };
@@ -344,7 +353,7 @@ class App extends Component {
 
   handleToggleBtnChange = (name, value) => {
     value !== null && this.setState({ [name]: value });
-  }
+  };
 
   incrementWeek = async () => {
     const start_date = format(
@@ -425,18 +434,16 @@ class App extends Component {
     const customLabel =
       customDateEl || (custom_start_date !== "" && custom_end_date !== "")
         ? `${format(custom_start_date, "YYYY-MM-DD")} - ${format(
-          custom_end_date,
-          "YYYY-MM-DD"
-        )}`
+            custom_end_date,
+            "YYYY-MM-DD"
+          )}`
         : "Custom";
 
     return (
       <div className="stats-container">
-        {/*<p>Gym name: {this.state.gymName}</p>
-        <p>Count sensors available:</p>
-        {this.state.sensors.map(sensor => (
-          <p>Sensor: {sensor.name}</p>
-        ))}*/}
+        {`Current mode: ${
+          this.state.mode
+        } // 1 means subtract count_out (init as 0), 2 means no subtraction`}
         <h1 className="header" style={{ alignSelf: "flex-start" }}>
           {header}
         </h1>
@@ -452,9 +459,7 @@ class App extends Component {
             <MenuItem value="class_report">Class title report</MenuItem>
             <MenuItem value="schedule_report">Schedule report</MenuItem>
             {isCountEnabled && (
-              <MenuItem value="calendar_report">
-                Calendar count report
-              </MenuItem>
+              <MenuItem value="calendar_report">Calendar count report</MenuItem>
             )}
           </Select>
         </div>
@@ -470,20 +475,20 @@ class App extends Component {
             {report !== "calendar_report" && <MenuItem value={0}>All</MenuItem>}
             {report !== "calendar_report"
               ? this.state.players.map(player => (
-                <MenuItem key={player.identitetid} value={player.identitetid}>
-                  {player.navn}
-                </MenuItem>
-              ))
-              : this.state.players
-                .filter(pl => pl.zone_id !== 0)
-                .map(player => (
-                  <MenuItem
-                    value={player.identitetid}
-                    key={player.identitetid}
-                  >
+                  <MenuItem key={player.identitetid} value={player.identitetid}>
                     {player.navn}
                   </MenuItem>
-                ))}
+                ))
+              : this.state.players
+                  .filter(pl => pl.zone_id !== 0)
+                  .map(player => (
+                    <MenuItem
+                      value={player.identitetid}
+                      key={player.identitetid}
+                    >
+                      {player.navn}
+                    </MenuItem>
+                  ))}
           </Select>
         </div>
         {report !== "calendar_report" && (
@@ -491,10 +496,36 @@ class App extends Component {
             <Divider />
             <div className="stats-container-row">
               <span>Date Range</span>
-              <ToggleButtonGroup className="ToggleButton" exclusive value={interval} onChange={this.handleDateChange}>
-                <ToggleButton value="1 week" className={interval === '1 week' ? 'ToggleButtonSelected' : ''}>Last 7 days</ToggleButton>
-                <ToggleButton value="3 weeks" className={interval === '3 weeks' ? 'ToggleButtonSelected' : ''}>Last 30 days</ToggleButton>
-                <ToggleButton value="custom" className={interval === 'custom' ? 'ToggleButtonSelected' : ''}>{customLabel}</ToggleButton>
+              <ToggleButtonGroup
+                className="ToggleButton"
+                exclusive
+                value={interval}
+                onChange={this.handleDateChange}
+              >
+                <ToggleButton
+                  value="1 week"
+                  className={
+                    interval === "1 week" ? "ToggleButtonSelected" : ""
+                  }
+                >
+                  Last 7 days
+                </ToggleButton>
+                <ToggleButton
+                  value="3 weeks"
+                  className={
+                    interval === "3 weeks" ? "ToggleButtonSelected" : ""
+                  }
+                >
+                  Last 30 days
+                </ToggleButton>
+                <ToggleButton
+                  value="custom"
+                  className={
+                    interval === "custom" ? "ToggleButtonSelected" : ""
+                  }
+                >
+                  {customLabel}
+                </ToggleButton>
               </ToggleButtonGroup>
             </div>
           </Fragment>
@@ -502,11 +533,36 @@ class App extends Component {
         <Divider />
         <div className="stats-container-row">
           <span>Event Type</span>
-          <ToggleButtonGroup className="ToggleButton" exclusive value={type} onChange={(_, value) => this.handleToggleBtnChange('type', value)}>
-            <ToggleButton value="all" className={type === 'all' ? 'ToggleButtonSelected' : ''}>All</ToggleButton>
-            <ToggleButton value="scheduled" className={type === 'scheduled' ? 'ToggleButtonSelected' : ''}>Scheduled</ToggleButton>
-            <ToggleButton value="live" className={type === 'live' ? 'ToggleButtonSelected' : ''}>Live</ToggleButton>
-            <ToggleButton value="ondemand" className={type === 'ondemand' ? 'ToggleButtonSelected' : ''}>On Demand</ToggleButton>
+          <ToggleButtonGroup
+            className="ToggleButton"
+            exclusive
+            value={type}
+            onChange={(_, value) => this.handleToggleBtnChange("type", value)}
+          >
+            <ToggleButton
+              value="all"
+              className={type === "all" ? "ToggleButtonSelected" : ""}
+            >
+              All
+            </ToggleButton>
+            <ToggleButton
+              value="scheduled"
+              className={type === "scheduled" ? "ToggleButtonSelected" : ""}
+            >
+              Scheduled
+            </ToggleButton>
+            <ToggleButton
+              value="live"
+              className={type === "live" ? "ToggleButtonSelected" : ""}
+            >
+              Live
+            </ToggleButton>
+            <ToggleButton
+              value="ondemand"
+              className={type === "ondemand" ? "ToggleButtonSelected" : ""}
+            >
+              On Demand
+            </ToggleButton>
           </ToggleButtonGroup>
         </div>
         {report !== "calendar_report" && (
@@ -514,9 +570,26 @@ class App extends Component {
             <Divider />
             <div className="stats-container-row">
               <span>Show</span>
-              <ToggleButtonGroup className="ToggleButton" exclusive value={show} onChange={(_, value) => this.handleToggleBtnChange('show', value)}>
-                <ToggleButton value={0} className={show === 0 ? 'ToggleButtonSelected' : ''}>Show</ToggleButton>
-                <ToggleButton value={1} className={show === 1 ? 'ToggleButtonSelected' : ''}>Only Count enabled</ToggleButton>
+              <ToggleButtonGroup
+                className="ToggleButton"
+                exclusive
+                value={show}
+                onChange={(_, value) =>
+                  this.handleToggleBtnChange("show", value)
+                }
+              >
+                <ToggleButton
+                  value={0}
+                  className={show === 0 ? "ToggleButtonSelected" : ""}
+                >
+                  Show
+                </ToggleButton>
+                <ToggleButton
+                  value={1}
+                  className={show === 1 ? "ToggleButtonSelected" : ""}
+                >
+                  Only Count enabled
+                </ToggleButton>
               </ToggleButtonGroup>
             </div>
           </Fragment>
@@ -562,12 +635,12 @@ class App extends Component {
             show={show}
           />
         ) : (
-            <Calendar
-              data={data}
-              setInterval={this.setInterval}
-              start_date={start_date}
-            />
-          )}
+          <Calendar
+            data={data}
+            setInterval={this.setInterval}
+            start_date={start_date}
+          />
+        )}
         <Popper open={Boolean(customDateEl)} anchorEl={customDateEl}>
           <Card raised>
             <CardContent className="flex" id="test">
